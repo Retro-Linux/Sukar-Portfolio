@@ -48,7 +48,17 @@ const processAfter =
 const heroArtwork = artworks.find(a => a.isFeatured) 
   || artworks.find(a => a.title.toLowerCase().includes('sunhat')) 
   || artworks[0];
-const heroDisplayUrl = heroArtwork ? resolveImageUrl(heroArtwork.image, 800) : '';
+
+let heroDisplayUrl = '';
+let heroSrcSet = undefined;
+
+if (heroArtwork) {
+  heroDisplayUrl = resolveImageUrl(heroArtwork.image, 800);
+  const src800 = resolveImageUrl(heroArtwork.image, 800);
+  const src1600 = resolveImageUrl(heroArtwork.image, 1600);
+  const src2400 = resolveImageUrl(heroArtwork.image, 2400);
+  heroSrcSet = `${src800} 800w, ${src1600} 1600w, ${src2400} 2400w`;
+}
 ---
 
 <Layout title="Studio — Art Portfolio" description="A curated collection of contemporary art and design work.">
@@ -59,7 +69,9 @@ const heroDisplayUrl = heroArtwork ? resolveImageUrl(heroArtwork.image, 800) : '
           <>
             <div class="process__tape" aria-hidden="true"></div>
             <img 
-              src={heroDisplayUrl} 
+              src={heroDisplayUrl}
+              srcset={heroSrcSet}
+              sizes="100vw"
               alt={heroArtwork.image.alt || heroArtwork.title} 
               width={heroArtwork.image.width}
               height={heroArtwork.image.height}
@@ -100,7 +112,8 @@ const heroDisplayUrl = heroArtwork ? resolveImageUrl(heroArtwork.image, 800) : '
   </section>
 
   <!-- ─── Gallery Section ─────────────────── -->
-  <section id="work" class="gallery" aria-label="Selected works">
+  <section id="work" class="gallery" aria-labelledby="gallery-heading">
+    <h2 id="gallery-heading" class="sr-only">Artwork Gallery</h2>
     <div class="gallery__inner">
       <div class="gallery__header">
         <div class="gallery__heading-group">

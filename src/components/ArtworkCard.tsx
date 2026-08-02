@@ -8,7 +8,7 @@
  * to avoid duplicating <style> tags per card instance.
  */
 import { motion } from 'framer-motion';
-import type { Artwork } from '../utils/sanity';
+import { resolveImageUrl, type Artwork } from '../utils/sanity';
 
 interface ArtworkCardProps {
   artwork: Artwork;
@@ -19,6 +19,11 @@ interface ArtworkCardProps {
 export default function ArtworkCard({ artwork, displayUrl }: ArtworkCardProps) {
   const { title, category, medium, image } = artwork;
   const aspectRatio = image.width / image.height;
+
+  const src400 = resolveImageUrl(image, 400);
+  const src800 = resolveImageUrl(image, 800);
+  const src1200 = resolveImageUrl(image, 1200);
+  const srcSet = `${src400} 400w, ${src800} 800w, ${src1200} 1200w`;
 
   /** Dispatch event to open the Lightbox with this artwork */
   function handleClick(): void {
@@ -47,6 +52,7 @@ export default function ArtworkCard({ artwork, displayUrl }: ArtworkCardProps) {
       <div className="artwork-card__image-wrap">
         <img
           src={displayUrl}
+          srcSet={srcSet}
           alt={image.alt}
           width={image.width}
           height={image.height}

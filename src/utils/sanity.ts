@@ -112,8 +112,8 @@ export function resolveImageUrl(
   image: ArtworkImage,
   width: number = 800,
 ): string {
-  // Use Sanity's CDN query parameters for basic optimization
-  return `${image.url}?w=${width}&auto=format`;
+  // Use Sanity's CDN query parameters for aggressive optimization
+  return `${image.url}?w=${width}&auto=format&fit=max&q=75`;
 }
 
 /* ─────────────────────────────────────────────

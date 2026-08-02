@@ -279,7 +279,7 @@ export default function Lightbox({ artworks }: LightboxProps) {
                   className={`flex items-center gap-2 transition-colors ${
                     localLikes.includes(currentArtwork._id) 
                       ? 'text-[#d4853a] cursor-default' 
-                      : 'text-white/50 hover:text-white'
+                      : 'text-white/70 hover:text-white'
                   }`}
                   aria-label={localLikes.includes(currentArtwork._id) ? "Already liked" : "Like this artwork"}
                 >
@@ -299,12 +299,12 @@ export default function Lightbox({ artworks }: LightboxProps) {
                 {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
                   <button 
                     onClick={handleShare}
-                    className="flex items-center gap-2 text-white/50 hover:text-white transition-colors ml-auto text-sm font-medium"
+                    className="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
                   >
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v12" />
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" />
                     </svg>
-                    Share
+                    <span className="font-mono text-sm font-semibold">Share</span>
                   </button>
                 )}
               </div>
