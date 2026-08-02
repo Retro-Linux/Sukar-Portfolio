@@ -35,6 +35,9 @@ export interface Artwork {
   category: ArtworkCategory;
   /** Whether this artwork is pinned to the hero section */
   isFeatured?: boolean;
+  year?: string;
+  description?: string;
+  likes: number;
   image: ArtworkImage;
   /** URL-friendly identifier */
   slug?: { current: string };
@@ -74,6 +77,9 @@ const ARTWORK_QUERY = /* groq */ `
     title,
     category,
     isFeatured,
+    year,
+    description,
+    "likes": coalesce(likes, 0),
     "image": {
       "cloudinaryId": image.cloudinaryId,
       "url": image.asset->url,
@@ -142,7 +148,10 @@ const sampleArtworks: Artwork[] = [
       height: 900,
       alt: 'Detailed graphite sketch of a solitary figure',
     },
-    medium: 'Graphite on paper',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
   {
     _id: 'art-002',
@@ -155,7 +164,10 @@ const sampleArtworks: Artwork[] = [
       height: 600,
       alt: 'Abstract oil painting with warm amber tones',
     },
-    medium: 'Oil on canvas',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
   {
     _id: 'art-003',
@@ -168,7 +180,10 @@ const sampleArtworks: Artwork[] = [
       height: 700,
       alt: 'Vibrant digital artwork with neon floral motifs',
     },
-    medium: 'Procreate',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
   {
     _id: 'art-004',
@@ -181,7 +196,10 @@ const sampleArtworks: Artwork[] = [
       height: 800,
       alt: 'Anatomical sketch study of hands in charcoal',
     },
-    medium: 'Charcoal on paper',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
   {
     _id: 'art-005',
@@ -194,7 +212,10 @@ const sampleArtworks: Artwork[] = [
       height: 950,
       alt: 'Abstract painting with flowing cerulean blue forms',
     },
-    medium: 'Acrylic on canvas',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
   {
     _id: 'art-006',
@@ -207,7 +228,10 @@ const sampleArtworks: Artwork[] = [
       height: 600,
       alt: 'Glitch art with pixel distortion effects',
     },
-    medium: 'Adobe Photoshop',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
   {
     _id: 'art-007',
@@ -220,7 +244,10 @@ const sampleArtworks: Artwork[] = [
       height: 1100,
       alt: 'Ink sketch of urban architecture and contours',
     },
-    medium: 'Ink on paper',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
   {
     _id: 'art-008',
@@ -233,7 +260,10 @@ const sampleArtworks: Artwork[] = [
       height: 700,
       alt: 'Expressionist painting with bold vermillion strokes',
     },
-    medium: 'Oil on linen',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
   {
     _id: 'art-009',
@@ -246,6 +276,9 @@ const sampleArtworks: Artwork[] = [
       height: 900,
       alt: 'Surreal digital composition with dreamlike elements',
     },
-    medium: 'Blender + Photoshop',
+    medium: '',
+    likes: 0,
+    year: '2024',
+    description: 'Sample description.',
   },
 ];

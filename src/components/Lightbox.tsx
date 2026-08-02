@@ -1,25 +1,14 @@
 /**
  * Lightbox.tsx
  * ──────────────────────────────────────────
- * Fullscreen immersive modal for fine-detail artwork inspection.
- * Framer Motion zoom-in / zoom-out transitions.
- * Keyboard: Esc to close, ← / → to navigate.
- *
- * Receives all artworks + pre-resolved URLs from Astro.
- * Listens for `open-lightbox` CustomEvent dispatched by ArtworkCard.
+ * Advanced Fullscreen Lightbox with gestures, zooming, and API integration.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Artwork } from '../utils/sanity';
 
-/* ─────────────────────────────────────────────
-   Types
-   ───────────────────────────────────────────── */
-
 export interface LightboxArtwork extends Artwork {
-  /** Pre-resolved display URL (grid size) */
   displayUrl: string;
-  /** Pre-resolved high-res URL (lightbox size) */
   highResUrl: string;
 }
 
@@ -27,57 +16,34 @@ interface LightboxProps {
   artworks: LightboxArtwork[];
 }
 
-/* ─────────────────────────────────────────────
-   Animation variants
-   ───────────────────────────────────────────── */
-
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
   exit: { opacity: 0 },
 };
 
-const imageVariants = {
-  hidden: { opacity: 0, scale: 0.92, y: 20 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 30, delay: 0.05 },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.95,
-    y: 10,
-    transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
-  },
-};
-
-/* ─────────────────────────────────────────────
-   Component
-   ───────────────────────────────────────────── */
-
 export default function Lightbox({ artworks }: LightboxProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [likedMap, setLikedMap] = useState<Record<string, number>>({});
+  const [isLiking, setIsLiking] = useState(false);
+  const [localLikes, setLocalLikes] = useState<string[]>([]);
+
   const isOpen = activeIndex !== null;
   const currentArtwork = isOpen ? artworks[activeIndex] : null;
 
-  /* ── Sync with URL Hash on Mount ─────────── */
+  /* ── URL Hash Sync ─────────── */
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
     if (!hash) return;
     const idx = artworks.findIndex((a) => a.slug?.current === hash);
-    if (idx !== -1) {
-      setActiveIndex(idx);
-    }
+    if (idx !== -1) setActiveIndex(idx);
   }, [artworks]);
 
-  /* ── Sync URL Hash when Active Artwork Changes ── */
   useEffect(() => {
     if (isOpen && currentArtwork?.slug?.current) {
       window.history.replaceState(null, '', `#${currentArtwork.slug.current}`);
     } else if (!isOpen && window.location.hash) {
-      // Only clear if the hash belongs to an artwork to avoid clearing #contact etc.
       const isArtworkHash = artworks.some(a => `#${a.slug?.current}` === window.location.hash);
       if (isArtworkHash) {
         window.history.replaceState(null, '', window.location.pathname + window.location.search);
@@ -85,9 +51,22 @@ export default function Lightbox({ artworks }: LightboxProps) {
     }
   }, [isOpen, currentArtwork, artworks]);
 
-  /* ── Navigation helpers ──────────────────── */
+  /* ── LocalStorage Sync ──────── */
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('sukar_liked_artworks');
+        if (stored) setLocalLikes(JSON.parse(stored));
+      } catch (e) {
+        console.error('Failed to parse local likes', e);
+      }
+    }
+  }, []);
+
+  /* ── Navigation ──────────────────── */
   const goTo = useCallback(
     (dir: -1 | 1) => {
+      setIsZoomed(false); // Reset zoom on navigation
       setActiveIndex((prev) => {
         if (prev === null) return null;
         const next = prev + dir;
@@ -96,29 +75,27 @@ export default function Lightbox({ artworks }: LightboxProps) {
         return next;
       });
     },
-    [artworks.length],
+    [artworks.length]
   );
 
-  const close = useCallback(() => setActiveIndex(null), []);
+  const close = useCallback(() => {
+    setIsZoomed(false);
+    setActiveIndex(null);
+  }, []);
 
-  /* ── Listen for open-lightbox events ─────── */
+  /* ── Listen for Events ─────── */
   useEffect(() => {
     function handleOpen(e: Event) {
       const { artworkId } = (e as CustomEvent<{ artworkId: string }>).detail;
       const idx = artworks.findIndex((a) => a._id === artworkId);
       if (idx !== -1) setActiveIndex(idx);
     }
-
     document.addEventListener('open-lightbox', handleOpen);
     return () => document.removeEventListener('open-lightbox', handleOpen);
   }, [artworks]);
 
-  /* ── Keyboard controls + focus trap ────────── */
-  const lightboxRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (!isOpen) return;
-
     function handleKey(e: KeyboardEvent) {
       switch (e.key) {
         case 'Escape':
@@ -130,332 +107,222 @@ export default function Lightbox({ artworks }: LightboxProps) {
         case 'ArrowRight':
           goTo(1);
           break;
-        case 'Tab': {
-          // Focus trap (R7 — WCAG 2.4.3)
-          const container = lightboxRef.current;
-          if (!container) break;
-          const focusable = container.querySelectorAll<HTMLElement>(
-            'button, [tabindex]:not([tabindex="-1"])',
-          );
-          if (focusable.length === 0) break;
-          const first = focusable[0];
-          const last = focusable[focusable.length - 1];
-          if (e.shiftKey && document.activeElement === first) {
-            e.preventDefault();
-            last.focus();
-          } else if (!e.shiftKey && document.activeElement === last) {
-            e.preventDefault();
-            first.focus();
-          }
-          break;
-        }
       }
     }
-
-    // Lock body scroll
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-
+    document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', handleKey);
-
-    // Move focus into the lightbox
-    const closeBtn = lightboxRef.current?.querySelector<HTMLElement>('.lightbox__close');
-    closeBtn?.focus();
-
     return () => {
+      document.body.style.overflow = '';
       document.removeEventListener('keydown', handleKey);
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      window.scrollTo(0, scrollY);
     };
   }, [isOpen, close, goTo]);
+
+  /* ── Actions ─────────────── */
+  const handleLike = async () => {
+    if (!currentArtwork || isLiking) return;
+    
+    // Prevent multiple likes per user
+    if (localLikes.includes(currentArtwork._id)) return;
+
+    setIsLiking(true);
+    
+    // Optimistic UI update
+    const updatedLocalLikes = [...localLikes, currentArtwork._id];
+    setLocalLikes(updatedLocalLikes);
+    localStorage.setItem('sukar_liked_artworks', JSON.stringify(updatedLocalLikes));
+    
+    setLikedMap(prev => ({
+      ...prev,
+      [currentArtwork._id]: (prev[currentArtwork._id] || currentArtwork.likes || 0) + 1
+    }));
+
+    try {
+      await fetch('/api/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ artworkId: currentArtwork._id })
+      });
+    } catch (err) {
+      console.error('Failed to like artwork', err);
+      // Revert on failure
+      const revertedLocal = localLikes.filter(id => id !== currentArtwork._id);
+      setLocalLikes(revertedLocal);
+      localStorage.setItem('sukar_liked_artworks', JSON.stringify(revertedLocal));
+      
+      setLikedMap(prev => ({
+        ...prev,
+        [currentArtwork._id]: (prev[currentArtwork._id] || 1) - 1
+      }));
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!currentArtwork || !navigator.share) return;
+    try {
+      await navigator.share({
+        title: currentArtwork.title,
+        text: `Check out ${currentArtwork.title} by the artist!`,
+        url: window.location.href,
+      });
+    } catch (err) {
+      console.log('Share canceled or failed', err);
+    }
+  };
+
+  const handleDragEnd = (_e: any, { offset }: any) => {
+    if (isZoomed) return; // Don't swipe image to next if zoomed in
+    const swipe = offset.x;
+    if (swipe < -50) goTo(1);
+    else if (swipe > 50) goTo(-1);
+  };
 
   return (
     <AnimatePresence>
       {isOpen && currentArtwork && (
         <motion.div
-          ref={lightboxRef}
-          className="lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Artwork detail view"
+          className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-8"
           variants={backdropVariants}
           initial="hidden"
           animate="visible"
           exit="exit"
-          transition={{ duration: 0.3, ease: 'easeOut' }}
+          style={{ backgroundColor: '#2a2826' }} // Warm dark charcoal
         >
-          {/* Backdrop click to close */}
-          <div className="lightbox__backdrop" onClick={close} />
+          {/* Close Area / Background Click */}
+          <div className="absolute inset-0" onClick={close} />
 
-          {/* ── Close button ──────────────── */}
+          {/* Top Bar: Counter & Close */}
+          <div className="absolute top-4 left-4 right-4 flex justify-between text-white/80 z-20 pointer-events-none">
+            <span className="text-sm font-medium tracking-widest uppercase">
+              {activeIndex! + 1} / {artworks.length}
+            </span>
+            <button
+              onClick={close}
+              className="p-2 hover:text-white transition-colors pointer-events-auto"
+              aria-label="Close lightbox"
+            >
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Left Arrow */}
           <button
-            className="lightbox__close"
-            onClick={close}
-            aria-label="Close lightbox"
-            type="button"
+            onClick={(e) => { e.stopPropagation(); goTo(-1); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white/60 hover:text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur transition-all z-20 hidden md:block"
+            aria-label="Previous image"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M18 6L6 18M6 6l12 12" />
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
-          {/* ── Nav arrows ────────────────── */}
-          {artworks.length > 1 && (
-            <>
-              <button
-                className="lightbox__nav lightbox__nav--prev"
-                onClick={() => goTo(-1)}
-                aria-label="Previous artwork"
-                type="button"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                className="lightbox__nav lightbox__nav--next"
-                onClick={() => goTo(1)}
-                aria-label="Next artwork"
-                type="button"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </>
-          )}
-
-          {/* ── Image + info ──────────────── */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentArtwork._id}
-              className="lightbox__content"
-              variants={imageVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
+          {/* Image Container with Gestures & Zoom */}
+          <div className="relative w-full h-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 z-10 pointer-events-none">
+            
+            {/* The Image */}
+            <motion.div 
+              className="relative max-w-full md:max-w-[70%] max-h-[70vh] md:max-h-full flex justify-center items-center pointer-events-auto cursor-zoom-in shrink-1"
+              drag={isZoomed ? true : "x"}
+              dragConstraints={isZoomed ? undefined : { left: 0, right: 0 }}
+              dragElastic={isZoomed ? 0.2 : 0.8}
+              onDragEnd={handleDragEnd}
+              onClick={() => setIsZoomed(!isZoomed)}
+              animate={{ scale: isZoomed ? 1.8 : 1, cursor: isZoomed ? 'zoom-out' : 'zoom-in' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
-              <div className="lightbox__image-wrap">
-                <img
-                  src={currentArtwork.highResUrl}
-                  alt={currentArtwork.image.alt}
-                  width={currentArtwork.image.width}
-                  height={currentArtwork.image.height}
-                  className="lightbox__image"
-                  draggable={false}
-                />
-              </div>
+              <img
+                key={currentArtwork._id}
+                src={currentArtwork.highResUrl}
+                alt={currentArtwork.title}
+                draggable={false}
+                className="max-w-full max-h-[70vh] md:max-h-[85vh] object-contain drop-shadow-2xl rounded-sm"
+              />
+            </motion.div>
 
-              <div className="lightbox__info">
-                <h2 className="lightbox__title">{currentArtwork.title}</h2>
-                <p className="lightbox__meta">
-                  <span>{currentArtwork.category}</span>
-                  <span className="lightbox__dot" />
-                  <span>{currentArtwork.medium}</span>
+            {/* Details Panel */}
+            <motion.div 
+              className="w-full md:w-80 bg-[#1e1c1b]/80 backdrop-blur-md p-6 rounded-xl border border-white/10 text-white/90 shadow-xl pointer-events-auto shrink-0 self-end md:self-center"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h2 className="text-2xl font-serif mb-1">{currentArtwork.title}</h2>
+              <div className="flex items-center gap-2 text-sm text-white/60 mb-4 font-mono uppercase tracking-wider">
+                <span>{currentArtwork.category}</span>
+                {currentArtwork.year && (
+                  <>
+                    <span>&middot;</span>
+                    <span>{currentArtwork.year}</span>
+                  </>
+                )}
+              </div>
+              
+              <p className="text-sm font-medium text-white/80 mb-6 italic border-l-2 border-[#d4853a] pl-3">
+                {currentArtwork.medium}
+              </p>
+
+              {currentArtwork.description && (
+                <p className="text-sm text-white/70 leading-relaxed mb-6 whitespace-pre-wrap">
+                  {currentArtwork.description}
                 </p>
-                {artworks.length > 1 && (
-                  <p className="lightbox__counter">
-                    {(activeIndex ?? 0) + 1} / {artworks.length}
-                  </p>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+                <motion.button 
+                  onClick={handleLike}
+                  whileTap={!localLikes.includes(currentArtwork._id) ? { scale: 0.9 } : {}}
+                  disabled={localLikes.includes(currentArtwork._id)}
+                  className={`flex items-center gap-2 transition-colors ${
+                    localLikes.includes(currentArtwork._id) 
+                      ? 'text-[#d4853a] cursor-default' 
+                      : 'text-white/50 hover:text-white'
+                  }`}
+                  aria-label={localLikes.includes(currentArtwork._id) ? "Already liked" : "Like this artwork"}
+                >
+                  <motion.svg 
+                    animate={isLiking ? { scale: [1, 1.4, 1] } : {}} 
+                    width="20" height="20" fill={localLikes.includes(currentArtwork._id) ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </motion.svg>
+                  <span className="font-mono text-sm font-semibold">
+                    {likedMap[currentArtwork._id] !== undefined 
+                      ? likedMap[currentArtwork._id] 
+                      : (currentArtwork.likes || 0)}
+                  </span>
+                </motion.button>
+
+                {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+                  <button 
+                    onClick={handleShare}
+                    className="flex items-center gap-2 text-white/50 hover:text-white transition-colors ml-auto text-sm font-medium"
+                  >
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v12" />
+                    </svg>
+                    Share
+                  </button>
                 )}
               </div>
             </motion.div>
-          </AnimatePresence>
 
-          {/* ── Scoped styles ─────────────── */}
-          <style>{`
-            .lightbox {
-              position: fixed;
-              inset: 0;
-              z-index: 200;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
+          </div>
 
-            .lightbox__backdrop {
-              position: absolute;
-              inset: 0;
-              background-color: rgba(250, 250, 250, 0.97);
-              backdrop-filter: blur(20px);
-              -webkit-backdrop-filter: blur(20px);
-            }
+          {/* Right Arrow */}
+          <button
+            onClick={(e) => { e.stopPropagation(); goTo(1); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white/60 hover:text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur transition-all z-20 hidden md:block"
+            aria-label="Next image"
+          >
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
 
-            .lightbox__close {
-              position: absolute;
-              top: 1.5rem;
-              right: 1.5rem;
-              z-index: 210;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              width: 44px;
-              height: 44px;
-              border: 1px solid rgba(0, 0, 0, 0.08);
-              border-radius: 50%;
-              background: #FFFFFF;
-              color: #000000;
-              cursor: pointer;
-              transition: border-color 0.2s ease, color 0.2s ease;
-            }
-
-            .lightbox__close:hover {
-              border-color: #7ED4E6;
-              color: #7ED4E6;
-            }
-
-            /* ── Nav arrows ────────────── */
-            .lightbox__nav {
-              position: absolute;
-              top: 50%;
-              transform: translateY(-50%);
-              z-index: 210;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              width: 48px;
-              height: 48px;
-              border: 1px solid rgba(0, 0, 0, 0.06);
-              border-radius: 50%;
-              background: #FFFFFF;
-              color: #000000;
-              cursor: pointer;
-              transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-            }
-
-            .lightbox__nav:hover {
-              border-color: #7ED4E6;
-              color: #7ED4E6;
-            }
-
-            .lightbox__nav--prev {
-              left: 1.5rem;
-            }
-
-            .lightbox__nav--prev:hover {
-              transform: translateY(-50%) translateX(-2px);
-            }
-
-            .lightbox__nav--next {
-              right: 1.5rem;
-            }
-
-            .lightbox__nav--next:hover {
-              transform: translateY(-50%) translateX(2px);
-            }
-
-            /* ── Content ───────────────── */
-            .lightbox__content {
-              position: relative;
-              z-index: 205;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              gap: 1.5rem;
-              max-width: 90vw;
-              max-height: 90vh;
-              pointer-events: none;
-            }
-
-            .lightbox__image-wrap {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              max-height: 72vh;
-              overflow: hidden;
-              border-radius: 4px;
-              box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.08),
-                0 4px 16px rgba(0, 0, 0, 0.04);
-              pointer-events: auto;
-            }
-
-            .lightbox__image {
-              display: block;
-              max-width: 100%;
-              max-height: 72vh;
-              width: auto;
-              height: auto;
-              object-fit: contain;
-              user-select: none;
-            }
-
-            .lightbox__info {
-              text-align: center;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              gap: 0.4rem;
-            }
-
-            .lightbox__title {
-              font-size: 1.15rem;
-              font-weight: 600;
-              color: #000000;
-              letter-spacing: -0.01em;
-            }
-
-            .lightbox__meta {
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-              font-size: 0.75rem;
-              font-weight: 400;
-              text-transform: uppercase;
-              letter-spacing: 0.08em;
-              color: rgba(0, 0, 0, 0.4);
-            }
-
-            .lightbox__dot {
-              display: inline-block;
-              width: 3px;
-              height: 3px;
-              border-radius: 50%;
-              background-color: #7ED4E6;
-            }
-
-            .lightbox__counter {
-              font-size: 0.68rem;
-              font-weight: 500;
-              letter-spacing: 0.12em;
-              color: rgba(0, 0, 0, 0.25);
-              margin-top: 0.15rem;
-            }
-
-            /* ── Mobile ────────────────── */
-            @media (max-width: 768px) {
-              .lightbox__nav {
-                width: 40px;
-                height: 40px;
-              }
-
-              .lightbox__nav--prev { left: 0.75rem; }
-              .lightbox__nav--next { right: 0.75rem; }
-
-              .lightbox__close {
-                top: 1rem;
-                right: 1rem;
-                width: 40px;
-                height: 40px;
-              }
-
-              .lightbox__content {
-                max-width: 95vw;
-              }
-
-              .lightbox__image-wrap {
-                max-height: 60vh;
-              }
-
-              .lightbox__image {
-                max-height: 60vh;
-              }
-            }
-          `}</style>
         </motion.div>
       )}
     </AnimatePresence>
