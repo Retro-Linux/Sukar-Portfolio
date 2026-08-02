@@ -58,7 +58,16 @@ const heroDisplayUrl = heroArtwork ? resolveImageUrl(heroArtwork.image, 800) : '
         {heroArtwork && (
           <>
             <div class="process__tape" aria-hidden="true"></div>
-            <img src={heroDisplayUrl} alt={heroArtwork.title || "Featured artwork"} class="hero__art-image" />
+            <img 
+              src={heroDisplayUrl} 
+              alt={heroArtwork.image.alt || heroArtwork.title} 
+              width={heroArtwork.image.width}
+              height={heroArtwork.image.height}
+              fetchpriority="high"
+              loading="eager"
+              decoding="sync"
+              class="hero__art-image" 
+            />
           </>
         )}
       </div>
