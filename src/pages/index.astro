@@ -45,7 +45,9 @@ const processAfter =
   'https://images.unsplash.com/photo-1573521193826-58c7dc2e13e3?w=900&h=600&fit=crop';
 
 /* ── Hero Artwork ─────────────────────────── */
-const heroArtwork = artworks.find(a => a.category === 'Digital Art') || artworks[0];
+const heroArtwork = artworks.find(a => a.isFeatured) 
+  || artworks.find(a => a.title.toLowerCase().includes('sunhat')) 
+  || artworks[0];
 const heroDisplayUrl = heroArtwork ? resolveImageUrl(heroArtwork.image, 800) : '';
 ---
 

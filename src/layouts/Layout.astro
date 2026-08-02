@@ -31,28 +31,26 @@ const currentPath = new URL(Astro.request.url).pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Global SEO & Open Graph Tags -->
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>Sukar's Sketchbook</title>
+    <meta name="description" content="The official digital portfolio featuring sketches, paintings, and digital art." />
     <meta name="theme-color" content="#fcfaf8" />
 
     <!-- Open Graph / Facebook / WhatsApp / Discord -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL('/og-image.jpg', Astro.url)} />
+    <meta property="og:title" content="Sukar's Sketchbook" />
+    <meta property="og:description" content="Explore my latest artwork and digital paintings." />
+    <meta property="og:image" content={new URL('/social-preview-image.jpg', Astro.url)} />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={new URL('/og-image.jpg', Astro.url)} />
+    <meta property="twitter:title" content="Sukar Sketchbook" />
+    <meta property="twitter:description" content="Explore my latest artwork and digital paintings." />
+    <meta property="twitter:image" content={new URL('/social-preview-image.jpg', Astro.url)} />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Fallback for older browsers asking for .ico implicitly -->
-    <link rel="alternate icon" href="/favicon.ico" />
 
     <!-- Google Fonts: Caveat, Fraunces, Nunito -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

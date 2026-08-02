@@ -33,6 +33,8 @@ export interface Artwork {
   _id: string;
   title: string;
   category: ArtworkCategory;
+  /** Whether this artwork is pinned to the hero section */
+  isFeatured?: boolean;
   image: ArtworkImage;
   /** URL-friendly identifier */
   slug?: { current: string };
@@ -71,6 +73,7 @@ const ARTWORK_QUERY = /* groq */ `
     _id,
     title,
     category,
+    isFeatured,
     "image": {
       "cloudinaryId": image.cloudinaryId,
       "url": image.asset->url,
