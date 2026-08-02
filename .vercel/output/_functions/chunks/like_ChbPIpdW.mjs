@@ -5,18 +5,27 @@ var like_exports = /* @__PURE__ */ __exportAll({
 	POST: () => POST,
 	prerender: () => false
 });
-createClient({
-	projectId: "nntbmkz8",
-	dataset: "production",
-	apiVersion: "2024-03-20",
-	useCdn: false,
-	token: void 0
-});
 var POST = async ({ request }) => {
 	try {
 		const { artworkId } = await request.json();
 		if (!artworkId) return new Response(JSON.stringify({ error: "Missing artwork ID" }), { status: 400 });
-		return new Response(JSON.stringify({ error: "Server misconfiguration: missing SANITY_API_TOKEN" }), { status: 500 });
+		const token = process.env.SANITY_API_TOKEN;
+		const projectId = "nntbmkz8";
+		if (!token) return new Response(JSON.stringify({ error: "Server misconfiguration: missing SANITY_API_TOKEN" }), { status: 500 });
+		await createClient({
+			projectId,
+			dataset: "production",
+			apiVersion: "2024-03-20",
+			useCdn: false,
+			token
+		}).patch(artworkId).inc({ likes: 1 }).commit();
+		return new Response(JSON.stringify({
+			success: true,
+			message: "Like incremented"
+		}), {
+			status: 200,
+			headers: { "Content-Type": "application/json" }
+		});
 	} catch (error) {
 		console.error("Failed to update likes:", error);
 		return new Response(JSON.stringify({ error: "Failed to update likes" }), { status: 500 });
