@@ -9,6 +9,7 @@ import vercel from '@astrojs/vercel';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.hercustomdomain.com',
+  output: 'server',
   adapter: vercel(),
   integrations: [
     react(),
@@ -16,5 +17,8 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      noExternal: ['@sanity/client', '@sanity/image-url']
+    }
   },
 });
