@@ -137,11 +137,12 @@ export default function Lightbox({ artworks }: LightboxProps) {
     }));
 
     try {
-      await fetch('/api/like', {
+      const res = await fetch('/api/like', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ artworkId: currentArtwork._id })
       });
+      if (!res.ok) throw new Error('API failed');
     } catch (err) {
       console.error('Failed to like artwork', err);
       // Revert on failure
