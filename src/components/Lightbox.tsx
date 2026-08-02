@@ -51,7 +51,7 @@ export default function Lightbox({ artworks }: LightboxProps) {
     }
   }, [isOpen, currentArtwork, artworks]);
 
-  /* ── LocalStorage Sync ──────── */
+  /* ── LocalStorage & Server Sync ──────── */
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -60,6 +60,16 @@ export default function Lightbox({ artworks }: LightboxProps) {
       } catch (e) {
         console.error('Failed to parse local likes', e);
       }
+
+      // Sync latest likes from server
+      fetch('/api/likes')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setLikedMap(prev => ({ ...prev, ...data }));
+          }
+        })
+        .catch(err => console.error('Failed to sync live likes', err));
     }
   }, []);
 
