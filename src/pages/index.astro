@@ -62,6 +62,12 @@ if (heroArtwork) {
 ---
 
 <Layout title="Studio — Art Portfolio" description="A curated collection of contemporary art and design work.">
+  {heroArtwork && (
+    <Fragment slot="head">
+      <link rel="preload" as="image" href={heroDisplayUrl} imagesrcset={heroSrcSet} />
+    </Fragment>
+  )}
+
   <section class="hero" aria-label="Introduction">
     <div class="hero__inner">
       <div class="hero__featured-art">
@@ -121,7 +127,7 @@ if (heroArtwork) {
           <h2 class="gallery__title">Selected Works</h2>
         </div>
 
-        <CategoryFilter client:load counts={counts} />
+        <CategoryFilter client:idle counts={counts} />
       </div>
 
       <MasonryGrid artworks={artworks} />
@@ -142,7 +148,7 @@ if (heroArtwork) {
       <div class="process__featured-art">
         <div class="process__tape" aria-hidden="true"></div>
         <BeforeAfterSlider
-          client:load
+          client:visible
           beforeSrc={processBefore}
           afterSrc={processAfter}
           beforeLabel="Sketch"
@@ -199,7 +205,7 @@ if (heroArtwork) {
   </section>
 
   <!-- ─── Lightbox (global, rendered once) ── -->
-  <Lightbox client:load artworks={lightboxArtworks} />
+  <Lightbox client:idle artworks={lightboxArtworks} />
 </Layout>
 
 <style>

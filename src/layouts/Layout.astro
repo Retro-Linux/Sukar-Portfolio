@@ -70,6 +70,9 @@ const currentPath = new URL(Astro.request.url).pathname;
         rel="stylesheet"
       />
     </noscript>
+
+    <!-- Page-specific head elements (e.g. LCP preloads) -->
+    <slot name="head" />
   </head>
 
   <body>

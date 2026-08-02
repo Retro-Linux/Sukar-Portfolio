@@ -109,7 +109,7 @@ export default function BeforeAfterSlider({
       >
         {/* ── After (full, background) ───── */}
         <div className="ba-slider__layer ba-slider__after">
-          <img src={afterSrc} alt={afterAlt} draggable={false} />
+          <img src={afterSrc} alt={afterAlt} draggable={false} loading="lazy" decoding="async" />
         </div>
 
         {/* ── Before (clipped, foreground) ── */}
@@ -117,7 +117,7 @@ export default function BeforeAfterSlider({
           className="ba-slider__layer ba-slider__before"
           style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
         >
-          <img src={beforeSrc} alt={beforeAlt} draggable={false} />
+          <img src={beforeSrc} alt={beforeAlt} draggable={false} loading="lazy" decoding="async" />
         </div>
 
         {/* ── Divider handle ───────────── */}
