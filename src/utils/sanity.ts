@@ -5,7 +5,6 @@
  * and development sample data.
  */
 import { createClient, type ClientConfig } from '@sanity/client';
-import { cloudinaryUrl } from './cloudinary';
 
 /* ─────────────────────────────────────────────
    Type Definitions
@@ -14,11 +13,8 @@ import { cloudinaryUrl } from './cloudinary';
 /** Allowed gallery categories */
 export type ArtworkCategory = 'Sketches' | 'Paintings' | 'Digital Art';
 
-/** Image asset — either a Cloudinary public ID or a direct URL */
 export interface ArtworkImage {
-  /** Cloudinary public ID (preferred) */
-  cloudinaryId?: string;
-  /** Fallback direct URL (used when no Cloudinary ID) */
+  /** Sanity image URL */
   url: string;
   /** Intrinsic width in pixels */
   width: number;
@@ -81,7 +77,6 @@ const ARTWORK_QUERY = /* groq */ `
     description,
     "likes": coalesce(likes, 0),
     "image": {
-      "cloudinaryId": image.cloudinaryId,
       "url": image.asset->url,
       "width": image.asset->metadata.dimensions.width,
       "height": image.asset->metadata.dimensions.height,
@@ -113,23 +108,12 @@ export async function getArtworks(): Promise<Artwork[]> {
   }
 }
 
-/**
- * Resolve the best display URL for an artwork image.
- * Prefers Cloudinary transforms; falls back to the raw URL.
- */
 export function resolveImageUrl(
   image: ArtworkImage,
   width: number = 800,
 ): string {
-  if (image.cloudinaryId) {
-    return cloudinaryUrl(image.cloudinaryId, {
-      width,
-      quality: 'auto',
-      format: 'auto',
-      crop: 'limit',
-    });
-  }
-  return image.url;
+  // Use Sanity's CDN query parameters for basic optimization
+  return `${image.url}?w=${width}&auto=format`;
 }
 
 /* ─────────────────────────────────────────────
