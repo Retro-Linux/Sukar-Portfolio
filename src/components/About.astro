@@ -1,0 +1,249 @@
+---
+/**
+ * About.astro
+ * ──────────────────────────────────────────
+ * Editorial bio section with a minimalist
+ * timeline of the artist's creative journey.
+ * Pure Astro — no client JS required.
+ */
+
+interface TimelineEntry {
+  year: string;
+  title: string;
+  description: string;
+}
+
+const timeline: TimelineEntry[] = [
+  {
+    year: '2016',
+    title: 'First Strokes',
+    description: 'Began formal studies in classical drawing and oil painting at the National Academy of Arts.',
+  },
+  {
+    year: '2018',
+    title: 'Digital Frontier',
+    description: 'Transitioned into digital illustration, blending traditional technique with modern tools.',
+  },
+  {
+    year: '2020',
+    title: 'First Solo Show',
+    description: 'Exhibited "Synthetic Dreams" — a 24-piece collection exploring the boundary between analog and digital art.',
+  },
+  {
+    year: '2022',
+    title: 'International Recognition',
+    description: 'Selected for the Contemporary Visions Biennial. Began accepting private commissions worldwide.',
+  },
+  {
+    year: '2024',
+    title: 'Studio Launch',
+    description: 'Opened a dedicated studio space. Focus shifted to large-format works and collaborative projects.',
+  },
+];
+---
+
+<section class="about" id="about" aria-label="About the artist">
+  <div class="about__inner">
+    <!-- Bio column -->
+    <div class="about__bio">
+      <p class="about__kicker">About</p>
+      <h2 class="about__name">
+        The Artist<span class="about__dot"></span>
+      </h2>
+      <p class="about__text">
+        A multidisciplinary artist working across graphite, oil, and digital
+        media. Every piece begins with observation — the way light fractures
+        across a surface, the tension in a resting hand, the silence between
+        two colours.
+      </p>
+      <p class="about__text">
+        The work is rooted in classical technique but driven by contemporary
+        questions. What happens when traditional craft meets generative tools?
+        When a sketch becomes a conversation with an algorithm? These
+        intersections are where the most honest art lives.
+      </p>
+      <p class="about__text about__text--muted">
+        Based in Amsterdam. Available for commissions, exhibitions, and
+        collaborative projects.
+      </p>
+    </div>
+
+    <!-- Timeline column -->
+    <div class="about__timeline" aria-label="Creative journey timeline">
+      <ul class="about__timeline-list" role="list">
+        {timeline.map((entry, idx) => (
+          <li class="about__timeline-item">
+            <span class="about__timeline-year">{entry.year}</span>
+            <div class="about__timeline-content">
+              <h3 class="about__timeline-title">{entry.title}</h3>
+              <p class="about__timeline-desc">{entry.description}</p>
+            </div>
+            {idx !== timeline.length - 1 && (
+              <svg class="about__timeline-divider" viewBox="0 0 100 10" preserveAspectRatio="none">
+                <path d="M0,5 Q25,8 50,4 T100,6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    background-color: var(--color-paper);
+    padding: 6rem var(--spacing-gutter) 7rem;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+  }
+
+  .about__inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  /* ── Bio ────────────────────────────── */
+  .about__bio {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .about__kicker {
+    font-family: var(--font-hand);
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--color-sky);
+    transform: rotate(-1deg);
+  }
+
+  .about__name {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-ink);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .about__dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-coral);
+    flex-shrink: 0;
+  }
+
+  .about__text {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 400;
+    line-height: 1.75;
+    color: var(--color-ink);
+  }
+
+  .about__text--muted {
+    color: var(--color-graphite);
+    font-style: italic;
+  }
+
+  /* ── Timeline ──────────────────────── */
+  .about__timeline-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 0.5rem;
+  }
+
+  .about__timeline-item {
+    position: relative;
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.5rem 0;
+  }
+
+  .about__timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.2rem;
+    top: 1.85rem;
+    width: 6px;
+    height: 12px;
+    border-radius: 10px;
+    background-color: var(--color-coral);
+    transform: rotate(15deg);
+    opacity: 0.8;
+  }
+
+  .about__timeline-item:nth-child(even)::before {
+    background-color: var(--color-sky);
+    transform: rotate(-10deg) translateY(2px);
+  }
+
+  .about__timeline-item:nth-child(3n)::before {
+    background-color: var(--color-amber);
+    transform: rotate(5deg) translateY(-2px);
+  }
+
+  .about__timeline-divider {
+    position: absolute;
+    bottom: -0.25rem;
+    left: 2rem;
+    width: 80%;
+    height: 10px;
+    color: var(--color-tape);
+    opacity: 0.5;
+  }
+
+  .about__timeline-year {
+    font-family: var(--font-hand);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-sky);
+    min-width: 3.5rem;
+    padding-top: 0.15rem;
+  }
+
+  .about__timeline-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .about__timeline-title {
+    font-family: var(--font-hand);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    letter-spacing: 0;
+  }
+
+  .about__timeline-desc {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--color-graphite);
+  }
+
+  /* ── Responsive ────────────────────── */
+  @media (max-width: 768px) {
+    .about {
+      padding: 4rem var(--spacing-gutter) 5rem;
+    }
+
+    .about__inner {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+</style>

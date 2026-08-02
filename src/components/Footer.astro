@@ -1,0 +1,67 @@
+---
+/**
+ * Footer.astro
+ * ──────────────────────────────────────────
+ * Site-wide footer. Extracted from Layout.astro
+ * for modularity and potential per-page variants.
+ */
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <p class="site-footer__copy">
+      &copy; {new Date().getFullYear()} 
+      <span class="site-footer__signature">Sukar Art</span>
+      <span class="site-footer__dot"></span>
+      <span class="site-footer__tagline">All rights reserved.</span>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px dashed var(--color-tape);
+    background-color: var(--color-parchment);
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+  }
+
+  .site-footer__inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 2rem var(--spacing-gutter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .site-footer__copy {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--color-ink);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .site-footer__dot {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--color-sky);
+    flex-shrink: 0;
+  }
+
+  .site-footer__tagline {
+    color: var(--color-graphite);
+  }
+
+  .site-footer__signature {
+    font-family: var(--font-hand);
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-amber);
+    margin-left: 0.2rem;
+  }
+</style>

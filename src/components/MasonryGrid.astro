@@ -1,0 +1,205 @@
+---
+/**
+ * MasonryGrid.astro
+ * ──────────────────────────────────────────
+ * Responsive CSS-columns masonry layout that interlocks
+ * portraits and landscapes without cropping.
+ *
+ * Each item is wrapped in a filterable container with a
+ * `data-category` attribute. A small client-side script
+ * listens for the `category-change` CustomEvent dispatched
+ * by the React CategoryFilter island.
+ */
+import ArtworkCard from './ArtworkCard.tsx';
+import { resolveImageUrl, type Artwork } from '../utils/sanity';
+
+interface Props {
+  artworks: Artwork[];
+}
+
+const { artworks } = Astro.props;
+---
+
+<div class="masonry-grid" id="masonry-grid">
+  {artworks.map((artwork) => {
+    const displayUrl = resolveImageUrl(artwork.image, 800);
+
+    return (
+      <div
+        class="masonry-grid__item"
+        id={artwork.slug?.current || artwork._id}
+        data-category={artwork.category}
+      >
+        <ArtworkCard
+          client:visible
+          artwork={artwork}
+          displayUrl={displayUrl}
+        />
+      </div>
+    );
+  })}
+</div>
+
+<!-- ─── Filter script ─────────────────────── -->
+<script>
+  function initMasonryFilter(): void {
+    const grid = document.getElementById('masonry-grid');
+    if (!grid) return;
+
+    const items = grid.querySelectorAll<HTMLElement>('.masonry-grid__item');
+
+    document.addEventListener('category-change', ((e: Event) => {
+      const { category } = (e as CustomEvent<{ category: string }>).detail;
+
+      items.forEach((item) => {
+        const itemCategory = item.getAttribute('data-category');
+        const show = category === 'All' || itemCategory === category;
+
+        if (show) {
+          item.style.height = '';
+          item.style.overflow = '';
+          item.style.marginBottom = '';
+          item.style.opacity = '1';
+        } else {
+          item.style.height = '0';
+          item.style.overflow = 'hidden';
+          item.style.marginBottom = '0';
+          item.style.opacity = '0';
+        }
+      });
+    }) as EventListener);
+  }
+
+  initMasonryFilter();
+  document.addEventListener('astro:after-swap', initMasonryFilter);
+</script>
+
+<style>
+  /* ──────────────────────────────────────────
+     CSS-columns masonry layout
+     ────────────────────────────────────────── */
+  .masonry-grid {
+    column-count: 3;
+    column-gap: 1.25rem;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .masonry-grid__item {
+    position: relative;
+    break-inside: avoid;
+    margin-bottom: 3.5rem; /* Generous spacing */
+    transition: opacity 0.35s ease;
+  }
+
+  /* Pinned artwork rotations */
+  .masonry-grid__item:nth-child(odd)  { transform: rotate(-0.5deg); }
+  .masonry-grid__item:nth-child(even) { transform: rotate(0.4deg); }
+  .masonry-grid__item:nth-child(3n)   { transform: rotate(0deg); }
+  .masonry-grid__item:nth-child(5n)   { transform: rotate(0.8deg); }
+
+
+  /* ── Responsive column counts ───────────── */
+  @media (max-width: 1024px) {
+    .masonry-grid {
+      column-count: 2;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .masonry-grid {
+      column-count: 1;
+      column-gap: 1rem;
+    }
+
+    .masonry-grid__item {
+      margin-bottom: 1rem;
+    }
+  }
+
+  /* ──────────────────────────────────────────
+     ArtworkCard styles (hosted here to avoid
+     duplicating <style> per React island instance)
+     ────────────────────────────────────────── */
+  :global(.artwork-card) {
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+    background-color: var(--color-cream);
+    cursor: pointer;
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.35s var(--ease-spring), transform 0.35s var(--ease-spring);
+  }
+
+  /* Tape removed from general gallery to keep it elegant and maintain artistic focus */
+
+  :global(.artwork-card:hover) {
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.1),
+      0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  :global(.artwork-card__image-wrap) {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  :global(.artwork-card__image) {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  :global(.artwork-card:hover .artwork-card__image) {
+    transform: scale(1.04);
+  }
+
+  /* ── Hover overlay ─────────────────── */
+  :global(.artwork-card__overlay) {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.25rem;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0) 50%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  :global(.artwork-card:hover .artwork-card__overlay) {
+    opacity: 1;
+  }
+
+  :global(.artwork-card__title) {
+    font-family: var(--font-hand);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-cream);
+    margin-bottom: 0.1rem;
+    letter-spacing: 0.02em;
+  }
+
+  :global(.artwork-card__meta) {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+
+  :global(.artwork-card__divider) {
+    opacity: 0.4;
+  }
+</style>

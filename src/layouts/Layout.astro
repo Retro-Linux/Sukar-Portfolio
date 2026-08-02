@@ -1,0 +1,91 @@
+---
+/**
+ * Layout.astro
+ * ──────────────────────────────────────────
+ * Root layout for all pages.
+ * Imports global CSS, Google Font (Outfit), Navbar, and footer.
+ */
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  /** Page <title> */
+  title: string;
+  /** Meta description for SEO */
+  description?: string;
+}
+
+const {
+  title,
+  description = 'A curated portfolio of contemporary art and design.',
+} = Astro.props;
+
+const currentPath = new URL(Astro.request.url).pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Global SEO & Open Graph Tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#fcfaf8" />
+
+    <!-- Open Graph / Facebook / WhatsApp / Discord -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/og-image.jpg', Astro.url)} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL('/og-image.jpg', Astro.url)} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Fallback for older browsers asking for .ico implicitly -->
+    <link rel="alternate icon" href="/favicon.ico" />
+
+    <!-- Google Fonts: Caveat, Fraunces, Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+  </head>
+
+  <body>
+    <Navbar currentPath={currentPath} />
+
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>
+
+<style>
+  /* ── Main content spacing ──────────────── */
+  #main-content {
+    min-height: calc(100dvh - 64px - 80px); /* viewport – navbar – footer */
+  }
+</style>
+

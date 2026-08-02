@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+/*──────────────────────────────────────────────
+  Design Tokens (Tailwind v4 CSS-first config)
+──────────────────────────────────────────────*/
+@theme {
+  /* ── Core palette — extracted from the artwork ────────────────────── */
+  --color-cream:       #FFF8F0;        /* warm sketchbook paper base */
+  --color-paper:       #FEF6E4;        /* alternate warm paper sections */
+  --color-parchment:   #F9EDD0;        /* deepest warm, used for footer */
+  --color-blush:       #F9C4C4;        /* skin tones & flowers */
+  --color-peach:       #FBCFAD;        /* amber painting warm mid */
+  --color-sky:         #A8D8EA;        /* ice-blue hair, signature accent */
+  --color-periwinkle:  #C9BBF0;        /* soft purple from digital art */
+  --color-amber:       #D4853A;        /* golden hoodie — warm CTA */
+  --color-coral:       #F47B89;        /* harbor blossoms — kicker accent */
+  --color-sage:        #A8C5A0;        /* harbor leaves */
+  --color-ink:         #3A2D35;        /* warm near-black body text */
+  --color-graphite:    #6B5E65;        /* muted secondary text */
+  --color-tape:        rgba(255, 210, 120, 0.68); /* masking tape amber */
+
+  /* Backwards-compatibility aliases */
+  --color-white:        #FFFFFF;
+  --color-studio-grey:  #FFF8F0;
+  --color-black:        #3A2D35;
+  --color-ice-blue:     #A8D8EA;
+  --color-ice-blue-dim: rgba(168, 216, 234, 0.2);
+
+  /* ── Typography ─────────────────────────────────────────────────────── */
+  --font-hand:    'Caveat', cursive;                          /* headings — handwritten */
+  --font-display: 'Fraunces', Georgia, serif;                 /* accent — artistic */
+  --font-body:    'Nunito', ui-sans-serif, system-ui, sans-serif; /* body — friendly */
+  --font-sans:    'Nunito', ui-sans-serif, system-ui, sans-serif; /* compat alias */
+
+  /* ── Spacing ─────────────────────────────────────────────────────────── */
+  --spacing-gutter: 1.5rem;
+
+  /* ── Easing ──────────────────────────────────────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/*──────────────────────────────────────────────
+  Base resets & defaults
+──────────────────────────────────────────────*/
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--color-ink);
+    background-color: var(--color-cream);
+    line-height: 1.6;
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background-color: var(--color-blush);
+    color: var(--color-ink);
+  }
+
+  /* Remove default link underlines globally — we add them intentionally */
+  a { text-decoration: none; color: inherit; }
+
+  /* Smooth image defaults */
+  img, video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/*──────────────────────────────────────────────
+  Utility: visually-hidden (a11y)
+──────────────────────────────────────────────*/
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/*──────────────────────────────────────────────
+  Keyframe animations
+──────────────────────────────────────────────*/
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px)   rotate(var(--rotate, 0deg)); }
+  50%       { transform: translateY(-10px) rotate(var(--rotate, 0deg)); }
+}
+
+@keyframes float-sway {
+  0%, 100% { transform: translateY(0px)  rotate(var(--rotate, 0deg)); }
+  33%       { transform: translateY(-7px) rotate(calc(var(--rotate, 0deg) + 4deg)); }
+  66%       { transform: translateY(-3px) rotate(calc(var(--rotate, 0deg) - 2deg)); }
+}
+
+@keyframes sparkle-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1)    rotate(0deg); }
+  50%       { opacity: 1;   transform: scale(1.25) rotate(45deg); }
+}
