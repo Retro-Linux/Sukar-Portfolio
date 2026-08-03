@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Artwork } from '../utils/sanity';
+import { ui } from '../i18n/ui';
 
 export interface LightboxArtwork extends Artwork {
   displayUrl: string;
@@ -33,6 +34,10 @@ export default function Lightbox({ artworks, lang = 'en' }: LightboxProps) {
 
   const isOpen = activeIndex !== null;
   const currentArtwork = isOpen ? artworks[activeIndex] : null;
+
+  const t = (key: keyof typeof ui['en']) => {
+    return ui[lang]?.[key] || ui['en'][key];
+  };
 
   /* ── URL Hash Sync ─────────── */
   useEffect(() => {
@@ -336,7 +341,7 @@ export default function Lightbox({ artworks, lang = 'en' }: LightboxProps) {
             >
               <h2 className="text-2xl font-serif mb-1">{currentArtwork.title}</h2>
               <div className="flex items-center gap-2 text-sm text-white/60 mb-4 font-mono uppercase tracking-wider">
-                <span>{currentArtwork.category}</span>
+                <span>{t(`gallery.filter_${currentArtwork.category.toLowerCase().replace(' ', '_')}` as keyof typeof ui['en']) || currentArtwork.category}</span>
                 {currentArtwork.year && (
                   <>
                     <span>&middot;</span>
@@ -389,7 +394,7 @@ export default function Lightbox({ artworks, lang = 'en' }: LightboxProps) {
                     <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" />
                     </svg>
-                    <span className="font-mono text-sm font-semibold">Share</span>
+                    <span className="font-mono text-sm font-semibold">{t('lightbox.btn_share')}</span>
                   </button>
                 )}
               </div>

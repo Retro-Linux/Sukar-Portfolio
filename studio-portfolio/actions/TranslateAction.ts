@@ -30,6 +30,9 @@ export function TranslateAction(props: DocumentActionProps) {
         if (doc.description && !doc.description_ar) {
           patches.description_ar = await translate(doc.description as string);
         }
+        if (doc.medium && !doc.medium_ar) {
+          patches.medium_ar = await translate(doc.medium as string);
+        }
 
         if (Object.keys(patches).length > 0) {
           await client.patch(props.id).set(patches).commit();

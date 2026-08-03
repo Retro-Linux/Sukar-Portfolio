@@ -33,6 +33,7 @@ const artworks = lang === 'ar'
       ...a,
       title: a.title_ar || a.title,
       description: a.description_ar || a.description,
+      medium: a.medium_ar || a.medium,
     }))
   : rawArtworks;
 

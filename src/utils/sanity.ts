@@ -41,6 +41,7 @@ export interface Artwork {
   slug?: { current: string };
   /** e.g. "Oil on canvas", "Graphite on paper", "Procreate" */
   medium: string;
+  medium_ar?: string;
 }
 
 /* ─────────────────────────────────────────────
@@ -87,7 +88,8 @@ const ARTWORK_QUERY = /* groq */ `
       "alt": coalesce(image.alt, title)
     },
     slug,
-    medium
+    medium,
+    medium_ar
   }
 `;
 

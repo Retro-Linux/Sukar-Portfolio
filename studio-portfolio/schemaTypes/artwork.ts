@@ -81,6 +81,12 @@ export const artwork = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'medium_ar',
+      title: 'Medium (Arabic)',
+      type: 'string',
+      description: 'Auto-translated or manually entered Arabic medium',
+    }),
+    defineField({
       name: 'image',
       title: 'Image',
       type: 'image',
