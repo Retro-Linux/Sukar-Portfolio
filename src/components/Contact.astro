@@ -82,12 +82,72 @@ const t = useTranslations(lang);
     </div>
   </div>
 
+  <!-- ── Honeypot (Hidden) ── -->
+  <input type="text" name="favorite_color" style="display:none" tabindex="-1" autocomplete="off" />
+
+  <!-- ── Turnstile Widget ── -->
+  <div class="cf-turnstile" data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}></div>
+
   <div class="contact-form__submit">
-    <button type="submit" class="btn btn--primary">
+    <button type="submit" class="btn btn--primary" id="contact-submit-btn">
       {t('contact.btn_send_message')}
     </button>
   </div>
+
+  <div id="contact-form-status" class="contact-form__status" aria-live="polite"></div>
 </form>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const statusDiv = document.getElementById('contact-form-status');
+  const submitBtn = document.getElementById('contact-submit-btn') as HTMLButtonElement;
+
+  if (form && statusDiv && submitBtn) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      
+      // Basic client validation to check if Turnstile is complete
+      const turnstileResponse = formData.get('cf-turnstile-response');
+      if (!turnstileResponse) {
+        statusDiv.textContent = 'Please complete the security check.';
+        statusDiv.className = 'contact-form__status contact-form__status--error';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      statusDiv.textContent = '';
+      statusDiv.className = 'contact-form__status';
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          form.reset();
+          if (window.turnstile) window.turnstile.reset();
+          statusDiv.textContent = 'Message sent successfully! I will get back to you soon.';
+          statusDiv.className = 'contact-form__status contact-form__status--success';
+        } else {
+          throw new Error(data.error || 'Failed to send message.');
+        }
+      } catch (err: any) {
+        statusDiv.textContent = err.message || 'An error occurred. Please try again later.';
+        statusDiv.className = 'contact-form__status contact-form__status--error';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+      }
+    });
+  }
+</script>
 
 <style>
   .contact-form {
@@ -171,6 +231,21 @@ const t = useTranslations(lang);
   .contact-form__submit:focus-visible {
     outline: 2px dashed var(--color-coral);
     outline-offset: 4px;
+  }
+
+  .contact-form__status {
+    margin-top: 1rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .contact-form__status--success {
+    color: var(--color-sage);
+  }
+
+  .contact-form__status--error {
+    color: var(--color-coral);
   }
 
   @media (max-width: 640px) {
