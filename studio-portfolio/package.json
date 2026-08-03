@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "sanity build",
-    "deploy": "sanity deploy",
+    "deploy": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "dev": "sanity dev",
     "start": "sanity start"
@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "@sanity/vision": "^6.8.0",
+    "cross-env": "^10.1.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "sanity": "^6.8.0",

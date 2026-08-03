@@ -1,8 +1,8 @@
 import {useState} from 'react'
-import {useDocumentOperation, type DocumentActionProps} from 'sanity'
+import {useClient, type DocumentActionProps} from 'sanity'
 
 export function TranslateAction(props: DocumentActionProps) {
-  const {patch} = useDocumentOperation(props.id, props.type)
+  const client = useClient({apiVersion: '2024-01-01'})
   const [isTranslating, setIsTranslating] = useState(false)
 
   const doc = props.draft || props.published
@@ -32,8 +32,7 @@ export function TranslateAction(props: DocumentActionProps) {
         }
 
         if (Object.keys(patches).length > 0) {
-          patch.set(patches);
-          patch.execute();
+          await client.patch(props.id).set(patches).commit();
         }
       } catch (err) {
         console.error('Translation failed', err)
