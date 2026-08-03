@@ -216,7 +216,7 @@ const targetUrl = lang === 'en' ? '/ar/' : '/';
     top: 0;
     z-index: 100;
     width: 100%;
-    background-color: rgba(255, 248, 240, 0.85); /* var(--color-cream) with opacity */
+    background-color: color-mix(in srgb, var(--color-cream) 85%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px dashed var(--color-tape);
@@ -363,7 +363,7 @@ const targetUrl = lang === 'en' ? '/ar/' : '/';
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(255, 248, 240, 0.98);
+    background-color: color-mix(in srgb, var(--color-cream) 98%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     opacity: 0;
