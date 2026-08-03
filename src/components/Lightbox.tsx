@@ -240,16 +240,12 @@ export default function Lightbox({ artworks }: LightboxProps) {
     <AnimatePresence>
       {isOpen && currentArtwork && (
         <motion.div
-          className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-8"
+          className="fixed inset-0 z-[150] bg-[#2a2826]"
           variants={backdropVariants}
           initial="hidden"
           animate="visible"
           exit="exit"
-          style={{ backgroundColor: '#2a2826' }} // Warm dark charcoal
         >
-          {/* Close Area / Background Click */}
-          <div className="absolute inset-0" onClick={close} />
-
           {/* Toast Notification */}
           <AnimatePresence>
             {toastMessage && (
@@ -257,21 +253,21 @@ export default function Lightbox({ artworks }: LightboxProps) {
                 initial={{ opacity: 0, y: -20, x: '-50%' }}
                 animate={{ opacity: 1, y: 0, x: '-50%' }}
                 exit={{ opacity: 0, y: -20, x: '-50%' }}
-                className="absolute top-6 left-1/2 z-50 bg-[#d4853a] text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg pointer-events-none"
+                className="absolute top-6 left-1/2 z-[200] bg-[#d4853a] text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg pointer-events-none"
               >
                 {toastMessage}
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Top Bar: Counter & Close */}
-          <div className="absolute top-4 left-4 right-4 flex justify-between text-white/80 z-20 pointer-events-none">
-            <span className="text-sm font-medium tracking-widest uppercase">
+          {/* Sticky Top Bar: Counter & Close */}
+          <div className="absolute top-4 left-4 right-4 flex justify-between text-white/80 z-[160] pointer-events-none">
+            <span className="text-sm font-medium tracking-widest uppercase mt-2 ml-2">
               {activeIndex! + 1} / {artworks.length}
             </span>
             <button
               onClick={close}
-              className="p-2 hover:text-white transition-colors pointer-events-auto"
+              className="p-2 hover:text-white transition-colors pointer-events-auto bg-black/20 hover:bg-black/40 rounded-full backdrop-blur"
               aria-label="Close lightbox"
             >
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -280,10 +276,10 @@ export default function Lightbox({ artworks }: LightboxProps) {
             </button>
           </div>
 
-          {/* Left Arrow */}
+          {/* Sticky Left Arrow */}
           <button
             onClick={(e) => { e.stopPropagation(); goTo(-1); }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white/60 hover:text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur transition-all z-20 hidden md:block"
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white/60 hover:text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur transition-all z-[160] hidden md:block"
             aria-label="Previous image"
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -291,8 +287,24 @@ export default function Lightbox({ artworks }: LightboxProps) {
             </svg>
           </button>
 
-          {/* Image Container with Gestures & Zoom */}
-          <div className="relative w-full h-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 z-10 pointer-events-none">
+          {/* Sticky Right Arrow */}
+          <button
+            onClick={(e) => { e.stopPropagation(); goTo(1); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white/60 hover:text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur transition-all z-[160] hidden md:block"
+            aria-label="Next image"
+          >
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Scrollable Content Area */}
+          <div className="absolute inset-0 overflow-y-auto overflow-x-hidden z-[155] flex flex-col items-center pt-24 pb-12 px-4 md:p-8 md:justify-center">
+            {/* Background Click Layer */}
+            <div className="absolute inset-0 min-h-full" onClick={close} />
+
+            {/* Image Container with Gestures & Zoom */}
+            <div className="relative w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 z-10 pointer-events-none my-auto">
             
             {/* The Image */}
             <motion.div 
@@ -384,17 +396,7 @@ export default function Lightbox({ artworks }: LightboxProps) {
 
           </div>
 
-          {/* Right Arrow */}
-          <button
-            onClick={(e) => { e.stopPropagation(); goTo(1); }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white/60 hover:text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur transition-all z-20 hidden md:block"
-            aria-label="Next image"
-          >
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
