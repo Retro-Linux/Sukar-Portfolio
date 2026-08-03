@@ -60,19 +60,19 @@
   }
 
   .dark {
-    --color-cream:       #181516;        /* dark base */
-    --color-paper:       #221e20;        /* dark paper */
-    --color-parchment:   #2c272a;        /* darkest warm */
-    --color-blush:       #8a5252;        /* muted blush */
-    --color-peach:       #996542;        /* muted peach */
-    --color-sky:         #315b6d;        /* muted sky */
-    --color-periwinkle:  #63538a;        /* muted periwinkle */
-    --color-amber:       #b5651f;        /* darker amber */
-    --color-coral:       #c24a58;        /* darker coral */
-    --color-sage:        #4e7045;        /* darker sage */
-    --color-ink:         #f0eae6;        /* light text */
-    --color-graphite:    #9b9296;        /* light secondary text */
-    --color-tape:        rgba(180, 130, 60, 0.68); /* darker tape */
+    --color-cream:       #1E1A1B;        /* charcoal base */
+    --color-paper:       #251F21;        /* slightly lighter charcoal */
+    --color-parchment:   #2C2527;        /* darkest warm charcoal */
+    --color-blush:       #E5A3A3;        /* vibrant blush */
+    --color-peach:       #E5B592;        /* vibrant peach */
+    --color-sky:         #88C2D8;        /* vibrant sky */
+    --color-periwinkle:  #B5A6E0;        /* vibrant periwinkle */
+    --color-amber:       #E29548;        /* vibrant amber */
+    --color-coral:       #F07180;        /* vibrant coral */
+    --color-sage:        #A3C19B;        /* vibrant sage */
+    --color-ink:         #F3EBE6;        /* warm off-white text */
+    --color-graphite:    #AFA4A7;        /* warm secondary text */
+    --color-tape:        rgba(230, 175, 90, 0.4); /* translucent amber tape */
   }
 
   body {
