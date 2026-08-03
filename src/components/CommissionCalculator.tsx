@@ -92,7 +92,7 @@ export default function CommissionCalculator({ lang = 'en' }: CommissionCalculat
       <div className="calc__result" aria-live="polite">
         <p className="calc__result-label">{t('commission.estimated_price') || 'Estimated Price'}</p>
         <p className="calc__result-price">
-          <span className="calc__result-currency">$</span>
+          <span className="calc__result-currency">EGP </span>
           {price}
         </p>
         <p className="calc__result-note">
