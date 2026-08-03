@@ -32,9 +32,8 @@ export function TranslateAction(props: DocumentActionProps) {
         }
 
         if (Object.keys(patches).length > 0) {
-          patch.execute([
-            { set: patches }
-          ])
+          patch.set(patches);
+          patch.execute();
         }
       } catch (err) {
         console.error('Translation failed', err)
