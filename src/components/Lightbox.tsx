@@ -28,6 +28,7 @@ export default function Lightbox({ artworks }: LightboxProps) {
   const [likedMap, setLikedMap] = useState<Record<string, number>>({});
   const [isLiking, setIsLiking] = useState(false);
   const [localLikes, setLocalLikes] = useState<string[]>([]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const isOpen = activeIndex !== null;
   const currentArtwork = isOpen ? artworks[activeIndex] : null;
@@ -70,8 +71,51 @@ export default function Lightbox({ artworks }: LightboxProps) {
           }
         })
         .catch(err => console.error('Failed to sync live likes', err));
+
+      // Sync offline pending likes
+      syncPendingLikes();
+      window.addEventListener('online', syncPendingLikes);
+      return () => window.removeEventListener('online', syncPendingLikes);
     }
   }, []);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const syncPendingLikes = async () => {
+    try {
+      const pending = localStorage.getItem('sukar_pending_likes');
+      if (!pending) return;
+      const parsed: string[] = JSON.parse(pending);
+      if (!parsed.length) return;
+      
+      let successful = 0;
+      for (const artworkId of parsed) {
+        try {
+          const res = await fetch('/api/like', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ artworkId })
+          });
+          if (res.ok) {
+            successful++;
+            parsed.splice(parsed.indexOf(artworkId), 1);
+          }
+        } catch (e) {
+          // Keep in pending if fetch fails
+        }
+      }
+      
+      localStorage.setItem('sukar_pending_likes', JSON.stringify(parsed));
+      if (successful > 0) {
+        showToast(`Synced ${successful} offline like${successful > 1 ? 's' : ''}!`);
+      }
+    } catch (e) {
+      console.error('Failed to sync pending likes', e);
+    }
+  };
 
   /* ── Navigation ──────────────────── */
   const goTo = useCallback(
@@ -152,18 +196,21 @@ export default function Lightbox({ artworks }: LightboxProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ artworkId: currentArtwork._id })
       });
-      if (!res.ok) throw new Error('API failed');
+      if (!res.ok) throw new Error(`API failed: ${res.status}`);
+      showToast('Thanks for the love!');
     } catch (err) {
       console.error('Failed to like artwork', err);
-      // Revert on failure
-      const revertedLocal = localLikes.filter(id => id !== currentArtwork._id);
-      setLocalLikes(revertedLocal);
-      localStorage.setItem('sukar_liked_artworks', JSON.stringify(revertedLocal));
-      
-      setLikedMap(prev => ({
-        ...prev,
-        [currentArtwork._id]: (prev[currentArtwork._id] || 1) - 1
-      }));
+      // Offline fallback: store in pending array to sync later
+      try {
+        const pending = JSON.parse(localStorage.getItem('sukar_pending_likes') || '[]');
+        if (!pending.includes(currentArtwork._id)) {
+          pending.push(currentArtwork._id);
+          localStorage.setItem('sukar_pending_likes', JSON.stringify(pending));
+        }
+        showToast('Saved offline. Will sync when reconnected.');
+      } catch (e) {
+        console.error('Failed to save pending like', e);
+      }
     } finally {
       setIsLiking(false);
     }
@@ -202,6 +249,20 @@ export default function Lightbox({ artworks }: LightboxProps) {
         >
           {/* Close Area / Background Click */}
           <div className="absolute inset-0" onClick={close} />
+
+          {/* Toast Notification */}
+          <AnimatePresence>
+            {toastMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -20, x: '-50%' }}
+                animate={{ opacity: 1, y: 0, x: '-50%' }}
+                exit={{ opacity: 0, y: -20, x: '-50%' }}
+                className="absolute top-6 left-1/2 z-50 bg-[#d4853a] text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg pointer-events-none"
+              >
+                {toastMessage}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Top Bar: Counter & Close */}
           <div className="absolute top-4 left-4 right-4 flex justify-between text-white/80 z-20 pointer-events-none">
