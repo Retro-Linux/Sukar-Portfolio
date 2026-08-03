@@ -12,8 +12,9 @@ export interface LightboxArtwork extends Artwork {
   highResUrl: string;
 }
 
-interface LightboxProps {
+export interface LightboxProps {
   artworks: LightboxArtwork[];
+  lang?: 'en' | 'ar';
 }
 
 const backdropVariants = {
@@ -22,7 +23,7 @@ const backdropVariants = {
   exit: { opacity: 0 },
 };
 
-export default function Lightbox({ artworks }: LightboxProps) {
+export default function Lightbox({ artworks, lang = 'en' }: LightboxProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [likedMap, setLikedMap] = useState<Record<string, number>>({});

@@ -28,6 +28,8 @@ interface BeforeAfterSliderProps {
   afterLabel?: string;
   /** Aspect ratio as a string, e.g. "3/2" */
   aspectRatio?: string;
+  /** Language for RTL support */
+  lang?: 'en' | 'ar';
 }
 
 /* ─────────────────────────────────────────────
@@ -42,6 +44,7 @@ export default function BeforeAfterSlider({
   beforeLabel = 'Sketch',
   afterLabel = 'Final',
   aspectRatio = '3/2',
+  lang = 'en',
 }: BeforeAfterSliderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState(50); // percentage 0–100

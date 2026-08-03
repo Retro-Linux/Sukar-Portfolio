@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {DocumentActionProps, useDocumentOperation} from 'sanity'
+import {useDocumentOperation, type DocumentActionProps} from 'sanity'
 
 export function TranslateAction(props: DocumentActionProps) {
   const {patch} = useDocumentOperation(props.id, props.type)

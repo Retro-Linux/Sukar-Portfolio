@@ -22,6 +22,8 @@ interface CategoryFilterProps {
   initial?: FilterValue;
   /** Category counts for badge display, keyed by FilterValue */
   counts?: Partial<Record<FilterValue, number>>;
+  /** Language for translations */
+  lang?: 'en' | 'ar';
 }
 
 /* ── Constants ────────────────────────────── */
