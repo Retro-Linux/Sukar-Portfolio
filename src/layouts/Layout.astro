@@ -52,14 +52,14 @@ const currentPath = new URL(Astro.request.url).pathname;
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL('/social-preview-image.jpg', Astro.url)} />
+    <meta property="og:image" content={new URL('/favicon.svg', Astro.url)} />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url} />
     <meta property="twitter:title" content="Sukar Sketchbook" />
     <meta property="twitter:description" content="Explore my latest artwork and digital paintings." />
-    <meta property="twitter:image" content={new URL('/social-preview-image.jpg', Astro.url)} />
+    <meta property="twitter:image" content={new URL('/favicon.svg', Astro.url)} />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
