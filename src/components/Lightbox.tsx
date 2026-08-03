@@ -271,7 +271,7 @@ export default function Lightbox({ artworks }: LightboxProps) {
                 )}
               </div>
               
-              <p className="text-sm font-medium text-white/80 mb-6 italic border-l-2 border-[#d4853a] pl-3">
+              <p className="text-sm font-medium text-white/80 mb-6 italic border-s-2 border-[#d4853a] ps-3">
                 {currentArtwork.medium}
               </p>
 

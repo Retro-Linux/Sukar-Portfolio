@@ -14,21 +14,33 @@ interface Props {
   title: string;
   /** Meta description for SEO */
   description?: string;
+  lang?: 'en' | 'ar';
+  dir?: 'ltr' | 'rtl';
 }
 
 const {
   title,
   description = 'A curated portfolio of contemporary art and design.',
+  lang = 'en',
+  dir = 'ltr',
 } = Astro.props;
 
 const currentPath = new URL(Astro.request.url).pathname;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang} dir={dir}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Theme Initialization Script (FOUC Prevention) -->
+    <script is:inline>
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
 
     <!-- Global SEO & Open Graph Tags -->
     <title>{title}</title>
@@ -76,13 +88,13 @@ const currentPath = new URL(Astro.request.url).pathname;
   </head>
 
   <body>
-    <Navbar currentPath={currentPath} />
+    <Navbar currentPath={currentPath} lang={lang} />
 
     <main id="main-content">
       <slot />
     </main>
 
-    <Footer />
+    <Footer lang={lang} />
   </body>
 </html>
 

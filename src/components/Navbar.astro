@@ -11,9 +11,14 @@
 interface Props {
   /** The current URL path — used to highlight the active nav link */
   currentPath?: string;
+  lang?: 'en' | 'ar';
 }
 
-const { currentPath = '/' } = Astro.props;
+const { currentPath = '/', lang = 'en' } = Astro.props;
+
+import ThemeToggle from './ThemeToggle';
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations(lang);
 
 /* ── Nav links ──────────────────────────────── */
 interface NavLink {
@@ -22,9 +27,9 @@ interface NavLink {
 }
 
 const links: NavLink[] = [
-  { label: 'Work',    href: '#work' },
-  { label: 'About',   href: '#about' },
-  { label: 'Contact', href: '#contact' },
+  { label: t('nav.work'),    href: '#work' },
+  { label: t('nav.about'),   href: '#about' },
+  { label: t('nav.contact'), href: '#contact' },
 ];
 
 /* ── Social links ───────────────────────────── */
@@ -55,9 +60,12 @@ const socials: SocialLink[] = [
 
 /** Check if a nav link is the current active page */
 function isActive(href: string): boolean {
-  if (href === '#work') return currentPath === '/' || currentPath.includes('#work');
+  if (href === '#work') return currentPath === '/' || currentPath === '/ar/' || currentPath.includes('#work');
   return currentPath.includes(href);
 }
+
+const targetLang = lang === 'en' ? 'ar' : 'en';
+const targetUrl = lang === 'en' ? '/ar/' : '/';
 ---
 
 <header class="navbar" id="site-navbar">
@@ -82,8 +90,18 @@ function isActive(href: string): boolean {
       ))}
     </ul>
 
-    <!-- ─── Social Icons (right) ────────────── -->
+    <!-- ─── Social Icons & Tools (right) ────────────── -->
     <div class="navbar__socials">
+      <a href={targetUrl} class="navbar__social-link navbar__lang-toggle" aria-label="Switch language">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+      </a>
+
+      <ThemeToggle client:load />
+
       {socials.map((social) => (
         <a
           href={social.href}

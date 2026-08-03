@@ -6,6 +6,13 @@
  * Pure Astro + HTML — no client JS needed.
  * All inputs have proper labels and focus states.
  */
+interface Props {
+  lang?: 'en' | 'ar';
+}
+const { lang = 'en' } = Astro.props;
+
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations(lang);
 ---
 
 <form
@@ -15,58 +22,71 @@
   aria-label="Contact form"
   id="contact-form"
 >
-  <div class="contact-form__field">
-    <label class="contact-form__label" for="contact-name">Name</label>
-    <input
-      class="contact-form__input"
-      type="text"
-      id="contact-name"
-      name="name"
-      placeholder="Your name"
-      required
-      autocomplete="name"
-    />
+  <!-- ── Name ── -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-name">{t('contact.field_name')}</label>
+    <div class="contact-form__input-wrap">
+      <input
+        type="text"
+        id="contact-name"
+        name="name"
+        class="contact-form__input"
+        placeholder={t('contact.placeholder_name')}
+        required
+      />
+    </div>
   </div>
 
-  <div class="contact-form__field">
-    <label class="contact-form__label" for="contact-email">Email</label>
-    <input
-      class="contact-form__input"
-      type="email"
-      id="contact-email"
-      name="email"
-      placeholder="you@example.com"
-      required
-      autocomplete="email"
-    />
+  <!-- ── Email ── -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-email">{t('contact.field_email')}</label>
+    <div class="contact-form__input-wrap">
+      <input
+        type="email"
+        id="contact-email"
+        name="email"
+        class="contact-form__input"
+        placeholder={t('contact.placeholder_email')}
+        required
+      />
+    </div>
   </div>
 
-  <div class="contact-form__field">
-    <label class="contact-form__label" for="contact-subject">Subject</label>
-    <input
-      class="contact-form__input"
-      type="text"
-      id="contact-subject"
-      name="subject"
-      placeholder="Commission, Collaboration, General Inquiry"
-    />
+  <!-- ── Subject ── -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-subject">{t('contact.field_subject')}</label>
+    <div class="contact-form__input-wrap">
+      <input
+        type="text"
+        id="contact-subject"
+        name="subject"
+        class="contact-form__input"
+        placeholder={t('contact.placeholder_subject')}
+        required
+      />
+    </div>
   </div>
 
-  <div class="contact-form__field">
-    <label class="contact-form__label" for="contact-message">Message</label>
-    <textarea
-      class="contact-form__textarea"
-      id="contact-message"
-      name="message"
-      placeholder="Tell me about your project…"
-      rows="5"
-      required
-    ></textarea>
+  <!-- ── Message ── -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-message">{t('contact.field_message')}</label>
+    <div class="contact-form__input-wrap">
+      <textarea
+        id="contact-message"
+        name="message"
+        class="contact-form__input contact-form__textarea"
+        placeholder={t('contact.placeholder_message')}
+        rows="5"
+        required
+      ></textarea>
+    </div>
   </div>
 
-  <button class="contact-form__submit" type="submit">
-    Send Message
-  </button>
+  <div class="contact-form__submit">
+    <button type="submit" class="btn btn--primary">
+      {t('contact.btn_send_message')}
+    </button>
+  </div>
 </form>
 
 <style>
@@ -109,7 +129,8 @@
 
   .contact-form__input::placeholder,
   .contact-form__textarea::placeholder {
-    color: rgba(0, 0, 0, 0.25);
+    color: var(--color-graphite);
+    opacity: 0.6;
     font-weight: 300;
   }
 

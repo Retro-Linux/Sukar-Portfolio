@@ -6,6 +6,7 @@
  * pointer events for unified mouse + touch support.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslations } from '../i18n/utils';
 
 /* ─────────────────────────────────────────────
    Constants
@@ -45,7 +46,12 @@ interface Point {
    Component
    ───────────────────────────────────────────── */
 
-export default function DoodlePad() {
+interface DoodlePadProps {
+  lang?: 'en' | 'ar';
+}
+
+export default function DoodlePad({ lang = 'en' }: DoodlePadProps) {
+  const t = useTranslations(lang);
   /* ── Refs ───────────────────────────────── */
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -239,18 +245,27 @@ export default function DoodlePad() {
         {/* Colour swatches */}
         <fieldset className="doodle-pad__group" role="radiogroup" aria-label="Brush colour">
           <legend className="sr-only">Brush colour</legend>
-          {COLORS.map((c) => (
+          {COLORS.map((c) => {
+            const labelMap: Record<string, string> = {
+              Black: t('doodle.color_black') || 'Black',
+              'Ice Blue': t('doodle.color_ice_blue') || 'Ice Blue',
+              Crimson: t('doodle.color_crimson') || 'Crimson',
+              Amber: t('doodle.color_amber') || 'Amber',
+              Emerald: t('doodle.color_emerald') || 'Emerald',
+              Amethyst: t('doodle.color_amethyst') || 'Amethyst',
+            };
+            return (
             <button
               key={c.value}
               type="button"
               className={`doodle-pad__swatch${brushColor === c.value ? ' doodle-pad__swatch--active' : ''}`}
               style={{ backgroundColor: c.value }}
               onClick={() => setBrushColor(c.value)}
-              aria-label={`${c.label} brush`}
+              aria-label={`${labelMap[c.label] || c.label} brush`}
               aria-pressed={brushColor === c.value}
-              title={c.label}
+              title={labelMap[c.label] || c.label}
             />
-          ))}
+          )})}
         </fieldset>
 
         {/* Divider */}
@@ -259,22 +274,28 @@ export default function DoodlePad() {
         {/* Size presets */}
         <fieldset className="doodle-pad__group" role="radiogroup" aria-label="Brush size">
           <legend className="sr-only">Brush size</legend>
-          {SIZES.map((s) => (
+          {SIZES.map((s) => {
+            const sizeMap: Record<string, string> = {
+              Fine: t('doodle.size_fine') || 'Fine',
+              Medium: t('doodle.size_medium') || 'Medium',
+              Broad: t('doodle.size_broad') || 'Broad',
+            };
+            return (
             <button
               key={s.value}
               type="button"
               className={`doodle-pad__size-btn${brushSize === s.value ? ' doodle-pad__size-btn--active' : ''}`}
               onClick={() => setBrushSize(s.value)}
-              aria-label={`${s.label} brush (${s.value}px)`}
+              aria-label={`${sizeMap[s.label] || s.label} brush (${s.value}px)`}
               aria-pressed={brushSize === s.value}
-              title={s.label}
+              title={sizeMap[s.label] || s.label}
             >
               <span
                 className="doodle-pad__size-dot"
                 style={{ width: s.value + 4, height: s.value + 4 }}
               />
             </button>
-          ))}
+          )})}
         </fieldset>
 
         {/* Divider */}
@@ -292,7 +313,7 @@ export default function DoodlePad() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2M19 6l-.867 12.142A2 2 0 0116.138 20H7.862a2 2 0 01-1.995-1.858L5 6" />
             </svg>
-            <span>Clear</span>
+            <span>{t('doodle.btn_clear')}</span>
           </button>
 
           <button
@@ -305,7 +326,7 @@ export default function DoodlePad() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
             </svg>
-            <span>Save</span>
+            <span>{t('doodle.btn_save')}</span>
           </button>
         </div>
       </div>
@@ -440,13 +461,13 @@ export default function DoodlePad() {
           font-weight: 500;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.5);
+          color: var(--color-graphite);
           transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
         }
 
         .doodle-pad__action-btn:hover {
-          color: #000;
-          border-color: rgba(0, 0, 0, 0.2);
+          color: var(--color-ink);
+          border-color: var(--color-tape);
         }
 
         .doodle-pad__action-btn:focus-visible {

@@ -9,6 +9,7 @@
  * CustomEvent on `document` — no shared React state needed.
  */
 import { useState } from 'react';
+import { useTranslations } from '../i18n/utils';
 import { motion } from 'framer-motion';
 import type { ArtworkCategory } from '../utils/sanity';
 
@@ -37,7 +38,9 @@ const CATEGORIES: FilterValue[] = [
 export default function CategoryFilter({
   initial = 'All',
   counts,
+  lang = 'en',
 }: CategoryFilterProps) {
+  const t = useTranslations(lang);
   const [active, setActive] = useState<FilterValue>(initial);
 
   function handleSelect(category: FilterValue): void {
@@ -50,6 +53,14 @@ export default function CategoryFilter({
       }),
     );
   }
+
+  const getLabel = (cat: FilterValue) => {
+    if (cat === 'All') return t('gallery.filter_all');
+    if (cat === 'Sketches') return t('gallery.filter_sketches');
+    if (cat === 'Paintings') return t('gallery.filter_paintings');
+    if (cat === 'Digital Art') return t('gallery.filter_digital_art');
+    return cat;
+  };
 
   return (
     <div className="category-filter" role="tablist" aria-label="Filter artworks by category">
@@ -94,10 +105,10 @@ export default function CategoryFilter({
               )}
             </span>
 
-            <span className="category-filter__label">{cat}</span>
+            <span className="category-filter__label">{getLabel(cat)}</span>
 
             {count !== undefined && (
-              <span className="category-filter__count">{count}</span>
+              <span className="category-filter__count"><bdi>{count}</bdi></span>
             )}
           </button>
         );
@@ -127,18 +138,18 @@ export default function CategoryFilter({
           font-weight: 500;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.45);
+          color: var(--color-graphite);
           transition: color 0.25s ease, border-color 0.25s ease;
           white-space: nowrap;
         }
 
         .category-filter__tab:hover {
-          color: #000;
-          border-color: rgba(0, 0, 0, 0.2);
+          color: var(--color-ink);
+          border-color: var(--color-ink);
         }
 
         .category-filter__tab--active {
-          color: #000;
+          color: var(--color-ink);
           border-color: transparent;
         }
 
@@ -161,11 +172,12 @@ export default function CategoryFilter({
           z-index: 1;
           font-size: 0.68rem;
           font-weight: 400;
-          color: rgba(0, 0, 0, 0.3);
+          color: var(--color-graphite);
+          opacity: 0.7;
         }
 
         .category-filter__tab--active .category-filter__count {
-          color: rgba(0, 0, 0, 0.55);
+          opacity: 1;
         }
       `}</style>
     </div>

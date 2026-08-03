@@ -11,6 +11,13 @@ export default defineConfig({
   site: 'https://www.hercustomdomain.com',
   output: 'server',
   adapter: vercel(),
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'ar'],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   integrations: [
     react(),
     sitemap(),

@@ -59,6 +59,22 @@
     text-rendering: optimizeLegibility;
   }
 
+  .dark {
+    --color-cream:       #181516;        /* dark base */
+    --color-paper:       #221e20;        /* dark paper */
+    --color-parchment:   #2c272a;        /* darkest warm */
+    --color-blush:       #8a5252;        /* muted blush */
+    --color-peach:       #996542;        /* muted peach */
+    --color-sky:         #315b6d;        /* muted sky */
+    --color-periwinkle:  #63538a;        /* muted periwinkle */
+    --color-amber:       #b5651f;        /* darker amber */
+    --color-coral:       #c24a58;        /* darker coral */
+    --color-sage:        #4e7045;        /* darker sage */
+    --color-ink:         #f0eae6;        /* light text */
+    --color-graphite:    #9b9296;        /* light secondary text */
+    --color-tape:        rgba(180, 130, 60, 0.68); /* darker tape */
+  }
+
   body {
     font-family: var(--font-body);
     color: var(--color-ink);

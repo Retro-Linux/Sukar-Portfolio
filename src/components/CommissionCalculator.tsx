@@ -6,6 +6,7 @@
  * dynamic price calculation via React state.
  */
 import { useMemo, useState } from 'react';
+import { useTranslations } from '../i18n/utils';
 
 /* ─────────────────────────────────────────────
    Pricing Data
@@ -19,29 +20,35 @@ interface Option {
   value: number;
 }
 
-const MEDIUMS: Option[] = [
-  { id: 'pencil', label: 'Pencil Sketch', description: 'Graphite or charcoal on paper', value: 80 },
-  { id: 'canvas', label: 'Canvas Painting', description: 'Oil or acrylic on stretched canvas', value: 200 },
-  { id: 'digital', label: 'Digital Art', description: 'Procreate or Photoshop illustration', value: 150 },
-];
-
-const FORMATS: Option[] = [
-  { id: 'portrait', label: 'Portrait / Bust', description: 'Head and shoulders', value: 1 },
-  { id: 'half', label: 'Half Body', description: 'Waist-up composition', value: 1.5 },
-  { id: 'full', label: 'Full Body', description: 'Complete figure', value: 2 },
-];
-
-const SIZES: Option[] = [
-  { id: 'small', label: 'Small', description: 'Up to A4 / 2000px', value: 1 },
-  { id: 'medium', label: 'Medium', description: 'Up to A3 / 4000px', value: 1.5 },
-  { id: 'large', label: 'Large', description: 'A2+ / 6000px+', value: 2 },
-];
-
 /* ─────────────────────────────────────────────
    Component
    ───────────────────────────────────────────── */
 
-export default function CommissionCalculator() {
+interface CommissionCalculatorProps {
+  lang?: 'en' | 'ar';
+}
+
+export default function CommissionCalculator({ lang = 'en' }: CommissionCalculatorProps) {
+  const t = useTranslations(lang);
+
+  const MEDIUMS: Option[] = [
+    { id: 'pencil', label: t('commission.medium_pencil_label') || 'Pencil Sketch', description: t('commission.medium_pencil_desc') || 'Graphite or charcoal on paper', value: 80 },
+    { id: 'canvas', label: t('commission.medium_canvas_label') || 'Canvas Painting', description: t('commission.medium_canvas_desc') || 'Oil or acrylic on stretched canvas', value: 200 },
+    { id: 'digital', label: t('commission.medium_digital_label') || 'Digital Art', description: t('commission.medium_digital_desc') || 'Procreate or Photoshop illustration', value: 150 },
+  ];
+
+  const FORMATS: Option[] = [
+    { id: 'portrait', label: t('commission.format_portrait_label') || 'Portrait / Bust', description: t('commission.format_portrait_desc') || 'Head and shoulders', value: 1 },
+    { id: 'half', label: t('commission.format_half_label') || 'Half Body', description: t('commission.format_half_desc') || 'Waist-up composition', value: 1.5 },
+    { id: 'full', label: t('commission.format_full_label') || 'Full Body', description: t('commission.format_full_desc') || 'Complete figure', value: 2 },
+  ];
+
+  const SIZES: Option[] = [
+    { id: 'small', label: t('commission.size_small_label') || 'Small', description: t('commission.size_small_desc') || 'Up to A4 / 2000px', value: 1 },
+    { id: 'medium', label: t('commission.size_medium_label') || 'Medium', description: t('commission.size_medium_desc') || 'Up to A3 / 4000px', value: 1.5 },
+    { id: 'large', label: t('commission.size_large_label') || 'Large', description: t('commission.size_large_desc') || 'A2+ / 6000px+', value: 2 },
+  ];
+
   const [medium, setMedium] = useState(MEDIUMS[0].id);
   const [format, setFormat] = useState(FORMATS[0].id);
   const [size, setSize] = useState(SIZES[0].id);
@@ -58,7 +65,7 @@ export default function CommissionCalculator() {
       <div className="calc__options">
         {/* Medium */}
         <OptionGroup
-          legend="Medium"
+          legend={t('commission.medium_legend') || 'Medium'}
           options={MEDIUMS}
           selected={medium}
           onSelect={setMedium}
@@ -66,7 +73,7 @@ export default function CommissionCalculator() {
 
         {/* Format */}
         <OptionGroup
-          legend="Format"
+          legend={t('commission.format_legend') || 'Format'}
           options={FORMATS}
           selected={format}
           onSelect={setFormat}
@@ -74,7 +81,7 @@ export default function CommissionCalculator() {
 
         {/* Size */}
         <OptionGroup
-          legend="Size"
+          legend={t('commission.size_legend') || 'Size'}
           options={SIZES}
           selected={size}
           onSelect={setSize}
@@ -83,13 +90,13 @@ export default function CommissionCalculator() {
 
       {/* Price display */}
       <div className="calc__result" aria-live="polite">
-        <p className="calc__result-label">Estimated Price</p>
+        <p className="calc__result-label">{t('commission.estimated_price') || 'Estimated Price'}</p>
         <p className="calc__result-price">
           <span className="calc__result-currency">$</span>
           {price}
         </p>
         <p className="calc__result-note">
-          Final pricing may vary based on complexity and revisions.
+          {t('commission.price_note') || 'Final pricing may vary based on complexity and revisions.'}
         </p>
       </div>
 
@@ -224,7 +231,7 @@ export default function CommissionCalculator() {
           font-size: 2rem;
           font-weight: 600;
           color: var(--color-coral);
-          margin-right: 0.15rem;
+          margin-inline-end: 0.15rem;
           margin-top: 0.15rem;
         }
 

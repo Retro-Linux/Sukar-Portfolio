@@ -13,7 +13,15 @@ interface TimelineEntry {
   description: string;
 }
 
-const timeline: TimelineEntry[] = [
+interface Props {
+  lang?: 'en' | 'ar';
+}
+const { lang = 'en' } = Astro.props;
+
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations(lang);
+
+const timelineEn: TimelineEntry[] = [
   {
     year: '2016',
     title: 'First Strokes',
@@ -40,31 +48,54 @@ const timeline: TimelineEntry[] = [
     description: 'Opened a dedicated studio space. Focus shifted to large-format works and collaborative projects.',
   },
 ];
+
+const timelineAr: TimelineEntry[] = [
+  {
+    year: '2016',
+    title: 'الخطوات الأولى',
+    description: 'بدأت الدراسات الرسمية في الرسم الكلاسيكي والرسم الزيتي في الأكاديمية الوطنية للفنون.',
+  },
+  {
+    year: '2018',
+    title: 'الحدود الرقمية',
+    description: 'انتقلت إلى التوضيح الرقمي، ومزجت التقنيات التقليدية مع الأدوات الحديثة.',
+  },
+  {
+    year: '2020',
+    title: 'أول معرض فردي',
+    description: 'عرضت "أحلام اصطناعية" — مجموعة من 24 قطعة تستكشف الحدود بين الفن التناظري والرقمي.',
+  },
+  {
+    year: '2022',
+    title: 'اعتراف دولي',
+    description: 'تم اختياري لبينالي الرؤى المعاصرة. بدأت بقبول العمولات الخاصة عالمياً.',
+  },
+  {
+    year: '2024',
+    title: 'إطلاق الاستوديو',
+    description: 'افتتحت مساحة استوديو مخصصة. تحول التركيز إلى الأعمال ذات التنسيق الكبير والمشاريع التعاونية.',
+  },
+];
+
+const timeline = lang === 'ar' ? timelineAr : timelineEn;
 ---
 
 <section class="about" id="about" aria-label="About the artist">
   <div class="about__inner">
     <!-- Bio column -->
     <div class="about__bio">
-      <p class="about__kicker">About</p>
+      <p class="about__kicker">{t('about.kicker')}</p>
       <h2 class="about__name">
-        The Artist<span class="about__dot"></span>
+        {t('about.title')}<span class="about__dot"></span>
       </h2>
       <p class="about__text">
-        A multidisciplinary artist working across graphite, oil, and digital
-        media. Every piece begins with observation — the way light fractures
-        across a surface, the tension in a resting hand, the silence between
-        two colours.
+        {t('about.bio_paragraph_1')}
       </p>
       <p class="about__text">
-        The work is rooted in classical technique but driven by contemporary
-        questions. What happens when traditional craft meets generative tools?
-        When a sketch becomes a conversation with an algorithm? These
-        intersections are where the most honest art lives.
+        {t('about.bio_paragraph_2')}
       </p>
       <p class="about__text about__text--muted">
-        Based in Amsterdam. Available for commissions, exhibitions, and
-        collaborative projects.
+        {t('about.bio_paragraph_3')}
       </p>
     </div>
 
@@ -161,7 +192,7 @@ const timeline: TimelineEntry[] = [
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    padding-left: 0.5rem;
+    padding-inline-start: 0.5rem;
   }
 
   .about__timeline-item {
@@ -174,8 +205,8 @@ const timeline: TimelineEntry[] = [
   .about__timeline-item::before {
     content: '';
     position: absolute;
-    left: -1.2rem;
-    top: 1.85rem;
+    inset-inline-start: -1.2rem;
+    top: 0.6rem;
     width: 6px;
     height: 12px;
     border-radius: 10px;

@@ -5,15 +5,24 @@
  * Site-wide footer. Extracted from Layout.astro
  * for modularity and potential per-page variants.
  */
+
+interface Props {
+  lang?: 'en' | 'ar';
+}
+const { lang = 'en' } = Astro.props;
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations(lang);
+
+const currentYear = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
   <div class="site-footer__inner">
     <p class="site-footer__copy">
-      &copy; {new Date().getFullYear()} 
-      <span class="site-footer__signature">Sukar Art</span>
+      &copy; {currentYear} 
+      <span class="site-footer__signature">{t('footer.signature')}</span>
       <span class="site-footer__dot"></span>
-      <span class="site-footer__tagline">All rights reserved.</span>
+      <span class="site-footer__tagline">{t('footer.tagline')}</span>
     </p>
   </div>
 </footer>
@@ -62,6 +71,6 @@
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--color-amber);
-    margin-left: 0.2rem;
+    margin-inline-start: 0.2rem;
   }
 </style>
