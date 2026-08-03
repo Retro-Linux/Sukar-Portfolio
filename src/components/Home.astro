@@ -27,7 +27,14 @@ import { getArtworks, resolveImageUrl, type ArtworkCategory } from '../utils/san
 import type { LightboxArtwork } from '../components/Lightbox.tsx';
 
 /* ── Fetch artwork data at build time ─────── */
-const artworks = await getArtworks();
+const rawArtworks = await getArtworks();
+const artworks = lang === 'ar' 
+  ? rawArtworks.map(a => ({
+      ...a,
+      title: a.title_ar || a.title,
+      description: a.description_ar || a.description,
+    }))
+  : rawArtworks;
 
 /* ── Compute category counts for filter badges ── */
 type FilterValue = 'All' | ArtworkCategory;

@@ -28,11 +28,13 @@ export interface ArtworkImage {
 export interface Artwork {
   _id: string;
   title: string;
+  title_ar?: string;
   category: ArtworkCategory;
   /** Whether this artwork is pinned to the hero section */
   isFeatured?: boolean;
   year?: string;
   description?: string;
+  description_ar?: string;
   likes: number;
   image: ArtworkImage;
   /** URL-friendly identifier */
@@ -71,10 +73,12 @@ const ARTWORK_QUERY = /* groq */ `
   *[_type == "artwork"] | order(_createdAt desc) {
     _id,
     title,
+    title_ar,
     category,
     isFeatured,
     year,
     description,
+    description_ar,
     "likes": coalesce(likes, 0),
     "image": {
       "url": image.asset->url,
