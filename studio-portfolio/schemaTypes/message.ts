@@ -4,18 +4,32 @@ export const messageType = defineType({
   name: 'message',
   title: 'Messages',
   type: 'document',
+  fieldsets: [
+    {
+      name: 'senderDetails',
+      title: 'Sender Information',
+      options: { columns: 2 },
+    },
+    {
+      name: 'meta',
+      title: 'Status & Metadata',
+      options: { columns: 2 },
+    },
+  ],
   fields: [
     defineField({
       name: 'name',
       title: 'Name',
       type: 'string',
       readOnly: true,
+      fieldset: 'senderDetails',
     }),
     defineField({
       name: 'email',
       title: 'Email',
       type: 'string',
       readOnly: true,
+      fieldset: 'senderDetails',
     }),
     defineField({
       name: 'subject',
@@ -33,6 +47,7 @@ export const messageType = defineType({
       name: 'status',
       title: 'Status',
       type: 'string',
+      fieldset: 'meta',
       options: {
         list: [
           { title: 'Unread', value: 'unread' },
@@ -48,6 +63,7 @@ export const messageType = defineType({
       title: 'Submitted At',
       type: 'datetime',
       readOnly: true,
+      fieldset: 'meta',
       initialValue: () => new Date().toISOString(),
     }),
   ],

@@ -102,12 +102,49 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         to: import.meta.env.CONTACT_EMAIL,
         subject: `New Commission Inquiry: ${subject}`,
         html: `
-          <h3>New message from your portfolio</h3>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <hr />
-          <p>${message.replace(/\n/g, '<br />')}</p>
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; }
+              .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+              .header { background: linear-gradient(135deg, #D4853A, #F47B89); padding: 30px 20px; text-align: center; color: white; }
+              .header h1 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.5px; }
+              .content { padding: 30px; }
+              .field { margin-bottom: 24px; }
+              .label { font-size: 12px; text-transform: uppercase; color: #888; letter-spacing: 1px; margin-bottom: 6px; font-weight: 700; }
+              .value { font-size: 16px; color: #111; margin: 0; }
+              .message-box { background: #fdfdfd; padding: 20px; border-radius: 8px; border-left: 4px solid #F47B89; margin-top: 30px; box-shadow: inset 0 0 0 1px #eee; }
+              .message-text { font-size: 15px; line-height: 1.6; color: #333; margin: 0; white-space: pre-wrap; }
+              .footer { text-align: center; padding: 20px; font-size: 12px; color: #aaa; background: #fafafa; border-top: 1px solid #eee; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>✨ New Portfolio Inquiry</h1>
+              </div>
+              <div class="content">
+                <div class="field">
+                  <div class="label">From</div>
+                  <p class="value"><strong>${name}</strong> &lt;${email}&gt;</p>
+                </div>
+                <div class="field">
+                  <div class="label">Subject</div>
+                  <p class="value">${subject}</p>
+                </div>
+                
+                <div class="message-box">
+                  <div class="label" style="margin-bottom: 12px; color: #F47B89;">Message Content</div>
+                  <p class="message-text">${message}</p>
+                </div>
+              </div>
+              <div class="footer">
+                Sent securely from Sukar Portfolio
+              </div>
+            </div>
+          </body>
+          </html>
         `,
       });
     }
