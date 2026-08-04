@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // 2. Validate with Zod
     const parsed = contactSchema.safeParse(data);
     if (!parsed.success) {
-      return new Response(JSON.stringify({ error: parsed.error.errors[0].message }), { status: 400 });
+      return new Response(JSON.stringify({ error: parsed.error.issues[0].message }), { status: 400 });
     }
 
     const { name, email, subject, message, favorite_color, 'cf-turnstile-response': turnstileToken } = parsed.data;

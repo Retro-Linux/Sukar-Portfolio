@@ -132,7 +132,7 @@ const t = useTranslations(lang);
 
         if (res.ok) {
           form.reset();
-          if (window.turnstile) window.turnstile.reset();
+          if ((window as any).turnstile) (window as any).turnstile.reset();
           statusDiv.textContent = 'Message sent successfully! I will get back to you soon.';
           statusDiv.className = 'contact-form__status contact-form__status--success';
         } else {
