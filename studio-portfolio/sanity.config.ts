@@ -4,10 +4,12 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 import {TranslateAction} from './actions/TranslateAction'
 import {CustomLogo} from './components/CustomLogo'
+import {myTheme} from './theme'
 
 export default defineConfig({
   name: 'default',
   title: 'Sukar Portfolio',
+  theme: myTheme,
 
   projectId: 'nntbmkz8',
   dataset: 'production',
