@@ -199,6 +199,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error: any) {
     console.error('Contact Form Error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error.' }), { status: 500 });
+    
+    // Return the actual error message to the frontend for debugging
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: `Server Error: ${errorMessage}` }), { status: 500 });
   }
 };
