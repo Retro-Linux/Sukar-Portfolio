@@ -3,10 +3,11 @@ import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 import {TranslateAction} from './actions/TranslateAction'
+import {CustomLogo} from './components/CustomLogo'
 
 export default defineConfig({
   name: 'default',
-  title: 'Studio-Portfolio',
+  title: 'Sukar Portfolio',
 
   projectId: 'nntbmkz8',
   dataset: 'production',
@@ -15,6 +16,12 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+  },
+
+  studio: {
+    components: {
+      logo: CustomLogo,
+    },
   },
 
   document: {

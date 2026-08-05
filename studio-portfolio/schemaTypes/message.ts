@@ -4,6 +4,7 @@ export const messageType = defineType({
   name: 'message',
   title: 'Messages',
   type: 'document',
+  icon: () => '✉️',
   fieldsets: [
     {
       name: 'senderDetails',
