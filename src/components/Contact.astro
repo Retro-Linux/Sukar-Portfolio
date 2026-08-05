@@ -97,11 +97,29 @@ const t = useTranslations(lang);
   <div id="contact-form-status" class="contact-form__status" aria-live="polite"></div>
 </form>
 
+<!-- ── Success Modal ── -->
+<div id="success-modal" class="success-modal" aria-hidden="true">
+  <div class="success-modal__content">
+    <button id="success-modal-close" class="success-modal__close" aria-label="Close modal" type="button">×</button>
+    <div class="success-modal__icon">💌</div>
+    <h3 class="success-modal__title">Yay! Message Sent!</h3>
+    <p class="success-modal__text">Thank you so much for reaching out! I've received your message and will get back to you as soon as I can.</p>
+  </div>
+</div>
+
 <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
   const form = document.getElementById('contact-form') as HTMLFormElement;
   const statusDiv = document.getElementById('contact-form-status');
   const submitBtn = document.getElementById('contact-submit-btn') as HTMLButtonElement;
+  const successModal = document.getElementById('success-modal');
+  const closeModalBtn = document.getElementById('success-modal-close');
+
+  if (closeModalBtn && successModal) {
+    closeModalBtn.addEventListener('click', () => {
+      successModal.classList.remove('is-visible');
+    });
+  }
 
   if (form && statusDiv && submitBtn) {
     form.addEventListener('submit', async (e) => {
@@ -133,8 +151,11 @@ const t = useTranslations(lang);
         if (res.ok) {
           form.reset();
           if ((window as any).turnstile) (window as any).turnstile.reset();
-          statusDiv.textContent = 'Message sent successfully! I will get back to you soon.';
-          statusDiv.className = 'contact-form__status contact-form__status--success';
+          if (successModal) {
+            successModal.classList.add('is-visible');
+          }
+          statusDiv.textContent = '';
+          statusDiv.className = 'contact-form__status';
         } else {
           throw new Error(data.error || 'Failed to send message.');
         }
@@ -246,6 +267,86 @@ const t = useTranslations(lang);
 
   .contact-form__status--error {
     color: var(--color-coral);
+  }
+
+  /* ── Success Modal ── */
+  .success-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(253, 246, 237, 0.85);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .success-modal.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .success-modal__content {
+    position: relative;
+    background: var(--color-paper);
+    padding: 2.5rem;
+    border-radius: 16px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(212, 133, 58, 0.15);
+    border: 2px solid var(--color-coral);
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .success-modal.is-visible .success-modal__content {
+    transform: translateY(0) scale(1);
+  }
+
+  .success-modal__close {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--color-coral);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .success-modal__close:hover {
+    transform: scale(1.2);
+  }
+
+  .success-modal__icon {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .success-modal__title {
+    font-family: var(--font-hand);
+    font-size: 2.2rem;
+    color: var(--color-coral);
+    margin-bottom: 0.5rem;
+  }
+
+  .success-modal__text {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    color: var(--color-ink);
+    line-height: 1.5;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
 
   @media (max-width: 640px) {

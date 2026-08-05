@@ -151,44 +151,49 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
 
       // Email back to the User (Auto-reply)
-      await resend.emails.send({
-        from: 'Sukar <onboarding@resend.dev>', // Should be a verified domain in production
-        to: email, // Sending directly to the user who filled the form
-        subject: `Thank you for reaching out! 🎨✨`,
-        html: `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fcf9f2; color: #444; margin: 0; padding: 20px; }
-              .container { max-width: 550px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04); border: 1px solid #f0e9d8; }
-              .header { background: #F47B89; padding: 30px 20px; text-align: center; color: white; }
-              .header h1 { margin: 0; font-size: 26px; font-family: 'Comic Sans MS', cursive, sans-serif; font-weight: normal; }
-              .content { padding: 40px 30px; text-align: center; line-height: 1.7; font-size: 16px; }
-              .highlight { color: #D4853A; font-weight: bold; }
-              .signoff { margin-top: 30px; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 20px; color: #F47B89; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Yay! I got your message! 💌</h1>
-              </div>
-              <div class="content">
-                <p>Hi <strong>${name}</strong>!</p>
-                <p>Thank you so much for visiting my portfolio and reaching out. It means the world to me! 🌍💖</p>
-                <p>I just wanted to let you know that your message flew straight into my inbox safely. Between school, homework, and drawing in my sketchbook, it might take me a little bit of time to reply, but I'll get back to you as soon as I can! ⏳🎨</p>
-                <p>Keep shining and creating beautiful things!</p>
-                <div class="signoff">
-                  Lots of love,<br/>
-                  Sukar 🇪🇬🖌️
+      try {
+        await resend.emails.send({
+          from: 'Sukar <onboarding@resend.dev>', // Should be a verified domain in production
+          to: email, // Sending directly to the user who filled the form
+          subject: `Thank you for reaching out! 🎨✨`,
+          html: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fcf9f2; color: #444; margin: 0; padding: 20px; }
+                .container { max-width: 550px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04); border: 1px solid #f0e9d8; }
+                .header { background: #F47B89; padding: 30px 20px; text-align: center; color: white; }
+                .header h1 { margin: 0; font-size: 26px; font-family: 'Comic Sans MS', cursive, sans-serif; font-weight: normal; }
+                .content { padding: 40px 30px; text-align: center; line-height: 1.7; font-size: 16px; }
+                .highlight { color: #D4853A; font-weight: bold; }
+                .signoff { margin-top: 30px; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 20px; color: #F47B89; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>Yay! I got your message! 💌</h1>
+                </div>
+                <div class="content">
+                  <p>Hi <strong>${name}</strong>!</p>
+                  <p>Thank you so much for visiting my portfolio and reaching out. It means the world to me! 🌍💖</p>
+                  <p>I just wanted to let you know that your message flew straight into my inbox safely. Between school, homework, and drawing in my sketchbook, it might take me a little bit of time to reply, but I'll get back to you as soon as I can! ⏳🎨</p>
+                  <p>Keep shining and creating beautiful things!</p>
+                  <div class="signoff">
+                    Lots of love,<br/>
+                    Sukar 🇪🇬🖌️
+                  </div>
                 </div>
               </div>
-            </div>
-          </body>
-          </html>
-        `,
-      });
+            </body>
+            </html>
+          `,
+        });
+      } catch (autoReplyErr) {
+        console.warn('Auto-reply failed (likely due to Resend unverified domain limits):', autoReplyErr);
+        // We do not throw here so the main form submission still succeeds!
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
