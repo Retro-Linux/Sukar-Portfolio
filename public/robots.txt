@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.hercustomdomain.com/sitemap-index.xml
+Sitemap: https://sukar-portfolio.vercel.app/sitemap-index.xml

@@ -8,7 +8,7 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://www.hercustomdomain.com',
+  site: process.env.PUBLIC_SITE_URL || 'https://sukar-portfolio.vercel.app',
   output: 'server',
   adapter: vercel(),
   i18n: {
